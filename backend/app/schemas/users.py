@@ -1,6 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, validator
-from typing import Optional, Literal
+from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
+from typing import Optional, ClassVar
 import re
 
 class UserRole(str, Enum):
@@ -14,10 +14,7 @@ class UserCreate(BaseModel):
     password: str =Field(min_length=8)
     role: UserRole = Field(default=UserRole.USER, example="user")
 
-    from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
-from typing import Optional, ClassVar
-import re
+
 
 
 class UserRole(str, Enum):

@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession 
 from sqlalchemy import select  
 from sqlalchemy.orm import Session
-from app import models, utils
+from app.models.users import User 
+from app.utils import  utils
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from app.schemas import UserCreate, UserOut,Token,TokenData 
-from app.database import get_db
+from app.schemas.users import UserCreate, UserOut,Token,TokenData 
+from app.database.database import get_db
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"]) 
@@ -31,7 +32,7 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
     Create new User
     """
     result = await db.execute(
-        select(models.User).where(models.User.username == user.username)
+        select(User).where(User.username == user.username)
     )
     existing_user = result.scalar_one_or_none()
     
@@ -39,7 +40,7 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
         raise HTTPException(status_code=400, detail="Username already exists")
     
     result = await db.execute(
-        select(models.User).where(models.User.email == user.email)
+        select(User).where(User.email == user.email)
     )
     existing_email = result.scalar_one_or_none()
     
@@ -48,7 +49,7 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
 
     hashed_pass = utils.hash_password(user.password)
 
-    new_user = models.User(
+    new_user = User(
         username=user.username,
         email=user.email,
         hashed_password=hashed_pass,
@@ -73,7 +74,7 @@ async def login(
 ):
     
     result = await db.execute(
-        select(models.User).where(models.User.username == form_data.username)
+        select(User).where(User.username == form_data.username)
     )
     user = result.scalar_one_or_none()
     
@@ -115,7 +116,7 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
     result = await db.execute(
-        select(models.User).where(models.User.username == token_data.username)
+        select(User).where(User.username == token_data.username)
     )
     user = result.scalar_one_or_none()
     
@@ -124,7 +125,7 @@ async def get_current_user(
     return user
 
 @router.get("/protected")
-async def protected_route(current_user: models.User = Depends(get_current_user)):
+async def protected_route(current_user:User = Depends(get_current_user)):
     return {
         "message": f"Hello, {current_user.username}! You accessed a protected route.",
         "user": {
@@ -136,7 +137,7 @@ async def protected_route(current_user: models.User = Depends(get_current_user))
     }
 
 def require_roles(allowed_roles: list[str]):
-    def role_checker(current_user: models.User = Depends(get_current_user)):
+    def role_checker(current_user:User = Depends(get_current_user)):
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -146,7 +147,7 @@ def require_roles(allowed_roles: list[str]):
     return role_checker
 
 @router.get("/profile")
-async def profile(current_user: models.User = Depends(require_roles(["user", "admin"]))):
+async def profile(current_user:User = Depends(require_roles(["user", "admin"]))):
     return {
         "message": f"Profile of {current_user.username} ({current_user.role})",
         "user_details": {
@@ -158,12 +159,12 @@ async def profile(current_user: models.User = Depends(require_roles(["user", "ad
     }
 
 @router.get("/user/dashboard")
-async def user_dashboard(current_user: models.User = Depends(require_roles(["user"]))):
+async def user_dashboard(current_user: User = Depends(require_roles(["user"]))):
     return {
         "message": f"Welcome to your dashboard, {current_user.username}!"
     }
 @router.get("/admin/dashboard")
-async def admin_dashboard(current_user: models.User = Depends(require_roles(["admin"]))):
+async def admin_dashboard(current_user: User = Depends(require_roles(["admin"]))):
     return {
         "message": f"Welcome Admin {current_user.username}!",
         "admin_info": {

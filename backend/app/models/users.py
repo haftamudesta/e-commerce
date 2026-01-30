@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sqlalchemy import Integer, Column, String
-from database import Base
+from app.database.database import Base
 
 class User(Base):
     __tablename__ = "users"
