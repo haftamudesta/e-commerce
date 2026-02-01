@@ -5,7 +5,7 @@ from sqlalchemy import select,func
 from app.models.categories import Category
 from app.schemas.categories import CategoryCreate, CategoryUpdate, CategoryOut,CategoriesResponse
 from app.database.database import get_db
-from app.api.users import get_current_user, require_roles
+from app.api.users import require_roles
 from app.models.users import User
 
 router = APIRouter(prefix="/api/v1/categories", tags=["categories"])
@@ -23,8 +23,10 @@ async def get_categories(
         select(Category).offset(skip).limit(limit).order_by(Category.id)
     )
     categories = result.scalars().all()
+
     count_result = await db.execute(select(func.count(Category.id)))
     total = count_result.scalar()
+
     category_list = []
     for category in categories:
         category_out = CategoryOut(
@@ -32,7 +34,6 @@ async def get_categories(
             name=category.name
         )
     category_list.append(category_out)
-    category_list = []
     for category in categories:
         category_out = CategoryOut(
             id=category.id,
@@ -66,7 +67,6 @@ async def get_category(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found"
         )
-    
     return category
 
 @router.post("/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
@@ -185,7 +185,6 @@ async def count_categories(
     """
     Get total count of categories
     """
-    from sqlalchemy import func
     result = await db.execute(select(func.count(Category.id)))
     total = result.scalar()
     return {"total": total}
