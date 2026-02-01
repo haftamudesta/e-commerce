@@ -202,8 +202,7 @@ export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    // You might want to update axios instance with new token here
-    // This depends on how your api.ts is set up
+    //  update axios instance with new token here
   }, [token]);
 
   const value = {
