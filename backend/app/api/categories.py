@@ -33,7 +33,7 @@ async def get_categories(
             id=category.id,
             name=category.name
         )
-    category_list.append(category_out)
+        category_list.append(category_out)
     
     page = (skip // limit) + 1 if limit > 0 else 1
     return CategoriesResponse(
@@ -43,7 +43,7 @@ async def get_categories(
         limit=limit
     )
 
-@router.get("/{category_id}", response_model=CategoriesResponse)
+@router.get("/{category_id}", response_model=CategoryOut)
 async def get_category(
     category_id: int,
     db: AsyncSession = Depends(get_db)
@@ -61,7 +61,7 @@ async def get_category(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found"
         )
-    return category
+    return CategoryOut(id=category.id, name=category.name)
 
 @router.post("/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
 async def create_category(
@@ -170,7 +170,7 @@ async def search_categories(
         select(Category).where(Category.name.ilike(f"%{name}%"))
     )
     categories = result.scalars().all()
-    return categories
+    return [CategoryOut(id=cat.id, name=cat.name) for cat in categories]
 
 @router.get("/count/", response_model=dict)
 async def count_categories(
