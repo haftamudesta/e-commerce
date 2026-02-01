@@ -12,7 +12,106 @@ bin-release/
 *.air
 *.ipa
 *.apk
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.tox/
+
+# Logs
+*.log
+logs/
+
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
+
+# FastAPI specific
+instance/
+.webassets-cache
+
+# Distribution / packaging
+dist/
+build/
+*.dist-info/
+*.tar.gz
+*.whl
+
+# PyInstaller
+*.exe
+
+# IPython
+.ipynb_checkpoints
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# ruff
+.ruff_cache/
+
+# SQLite (if you use it)
+*.db
+*.sqlite
