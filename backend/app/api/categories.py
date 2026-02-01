@@ -34,12 +34,6 @@ async def get_categories(
             name=category.name
         )
     category_list.append(category_out)
-    for category in categories:
-        category_out = CategoryOut(
-            id=category.id,
-            name=category.name
-        )
-        category_list.append(category_out)
     
     page = (skip // limit) + 1 if limit > 0 else 1
     return CategoriesResponse(
