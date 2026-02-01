@@ -74,7 +74,9 @@ export default function CategoryListContext({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Categories</h2>
+        <h2 className="text-3xl text-center font-bold text-gray-800 ">
+          Categories
+        </h2>
         {user?.role === "admin" && (
           <Link
             href="/admin/categories/new"
@@ -99,7 +101,7 @@ export default function CategoryListContext({
           )}
         </div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden ">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -161,8 +163,6 @@ export default function CategoryListContext({
           </table>
         </div>
       )}
-
-      {/* Pagination */}
       {total > limit && (
         <div className="flex justify-between items-center pt-4">
           <div className="text-sm text-gray-700">
