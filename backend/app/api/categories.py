@@ -1,16 +1,16 @@
 from typing import  List
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select,func
 from app.models.categories import Category
-from app.schemas.categories import CategoryCreate, CategoryUpdate, CategoryOut
+from app.schemas.categories import CategoryCreate, CategoryUpdate, CategoryOut,CategoriesResponse
 from app.database.database import get_db
 from app.api.users import get_current_user, require_roles
 from app.models.users import User
 
 router = APIRouter(prefix="/api/v1/categories", tags=["categories"])
 
-@router.get("/", response_model=List[CategoryOut])
+@router.get("/", response_model=CategoriesResponse)
 async def get_categories(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(10, ge=1, le=10, description="Number of records to return"),
@@ -23,9 +23,32 @@ async def get_categories(
         select(Category).offset(skip).limit(limit).order_by(Category.id)
     )
     categories = result.scalars().all()
-    return categories
+    count_result = await db.execute(select(func.count(Category.id)))
+    total = count_result.scalar()
+    category_list = []
+    for category in categories:
+        category_out = CategoryOut(
+            id=category.id,
+            name=category.name
+        )
+    category_list.append(category_out)
+    category_list = []
+    for category in categories:
+        category_out = CategoryOut(
+            id=category.id,
+            name=category.name
+        )
+        category_list.append(category_out)
+    
+    page = (skip // limit) + 1 if limit > 0 else 1
+    return CategoriesResponse(
+        categories=category_list,
+        total=total,
+        page=page,
+        limit=limit
+    )
 
-@router.get("/{category_id}", response_model=CategoryOut)
+@router.get("/{category_id}", response_model=CategoriesResponse)
 async def get_category(
     category_id: int,
     db: AsyncSession = Depends(get_db)
@@ -154,3 +177,15 @@ async def search_categories(
     )
     categories = result.scalars().all()
     return categories
+
+@router.get("/count/", response_model=dict)
+async def count_categories(
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get total count of categories
+    """
+    from sqlalchemy import func
+    result = await db.execute(select(func.count(Category.id)))
+    total = result.scalar()
+    return {"total": total}

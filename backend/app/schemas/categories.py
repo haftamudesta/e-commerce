@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict,Field
-from typing import Optional
+from typing import Optional,List
 
 class CategoryBase(BaseModel):
     name: str =Field(min_length=1, max_length=100)
@@ -18,3 +18,10 @@ class Category(CategoryBase):
 class CategoryOut(BaseModel):
     id:int
     name: str
+    model_config = ConfigDict(from_attributes=True)
+
+class CategoriesResponse(BaseModel):
+    categories: List[CategoryOut]
+    total: int
+    page: int
+    limit: int
