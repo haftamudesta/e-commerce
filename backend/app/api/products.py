@@ -252,3 +252,26 @@ async def update_product(
         updated_at=product.updated_at
     )
 
+@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Delete a product (Admin/Seller only)
+    """
+    result = await db.execute(
+        select(Product).where(Product.id == product_id)
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    
+    await db.delete(product)
+    await db.commit()
+    
+    return None
