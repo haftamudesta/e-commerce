@@ -275,3 +275,97 @@ async def delete_product(
     await db.commit()
     
     return None
+
+@router.get("/category/{category_id}", response_model=ProductListResponse)
+async def get_products_by_category(
+    category_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get products by category ID
+    """
+    result = await db.execute(
+        select(Category).where(Category.id == category_id)
+    )
+    category = result.scalar_one_or_none()
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found"
+        )
+    
+    result = await db.execute(
+        select(Product)
+        .where(Product.category_id == category_id)
+        .offset(skip)
+        .limit(limit)
+        .order_by(Product.created_at.desc())
+    )
+    products = result.scalars().all()
+    count_result = await db.execute(
+        select(func.count(Product.id)).where(Product.category_id == category_id)
+    )
+    total = count_result.scalar()
+    product_list = []
+    for product in products:
+        product_out = ProductOut(
+            id=product.id,
+            name=product.name,
+            description=product.description,
+            price=product.price,
+            quantity=product.quantity,
+            slug=product.slug,
+            status=product.status,
+            category_id=product.category_id,
+            created_at=product.created_at,
+            updated_at=product.updated_at
+        )
+        product_list.append(product_out)
+    
+    page = (skip // limit) + 1 if limit > 0 else 1
+    return ProductListResponse(
+        products=product_list,
+        total=total,
+        page=page,
+        limit=limit
+    )
+
+@router.get("/search/", response_model=List[ProductOut])
+async def search_products(
+    q: str = Query(..., min_length=1, description="Search query"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Search products by name or description
+    """
+    search_term = f"%{q}%"
+    result = await db.execute(
+        select(Product)
+        .where(
+            or_(
+                Product.name.ilike(search_term),
+                Product.description.ilike(search_term)
+            )
+        )
+        .order_by(Product.created_at.desc())
+        .limit(20)
+    )
+    products = result.scalars().all()
+
+    return [
+        ProductOut(
+            id=product.id,
+            name=product.name,
+            description=product.description,
+            price=product.price,
+            quantity=product.quantity,
+            slug=product.slug,
+            status=product.status,
+            category_id=product.category_id,
+            created_at=product.created_at,
+            updated_at=product.updated_at
+        )
+        for product in products
+    ]
