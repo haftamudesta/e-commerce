@@ -2,6 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, validator, ConfigDict
 from decimal import Decimal
+from app.schemas.categories import CategoryOut
 
 class ProductBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
@@ -77,3 +78,9 @@ class ProductFilter(BaseModel):
         if v is not None and v < 0:
             raise ValueError('Price must be positive')
         return v
+
+class ProductWithCategory(ProductOut):
+    category: Optional['CategoryOut'] = None
+
+
+ProductWithCategory.model_rebuild()

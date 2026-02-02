@@ -19,4 +19,3 @@ class Product(Base):
     
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     category = relationship("Category", back_populates="products")
-    reviews = relationship("Review", back_populates="product", cascade="all, delete-orphan")

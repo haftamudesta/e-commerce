@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.users import router as users_router;
 from app.api.categories import router as category_router;
+from app.api.products import router as product_router;
 from app.database.database import Base, engine
 from app import models
 
@@ -35,3 +36,4 @@ app.add_middleware(
 )
 app.include_router(users_router)
 app.include_router(category_router)
+app.include_router(product_router)
