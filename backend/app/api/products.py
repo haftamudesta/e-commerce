@@ -187,3 +187,68 @@ async def create_product(
         created_at=new_product.created_at,
         updated_at=new_product.updated_at
     )
+
+@router.put("/{product_id}", response_model=ProductOut)
+async def update_product(
+    product_id: int,
+    product_update: ProductUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Update a product (Admin/Seller only)
+    """
+    result = await db.execute(
+        select(Product).where(Product.id == product_id)
+    )
+    product = result.scalar_one_or_none()
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    if product_update.category_id is not None:
+        result = await db.execute(
+            select(Category).where(Category.id == product_update.category_id)
+        )
+        category = result.scalar_one_or_none()
+        
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Category not found"
+            )
+    if product_update.slug and product_update.slug != product.slug:
+        result = await db.execute(
+            select(Product).where(Product.slug == product_update.slug)
+        )
+        existing_product = result.scalar_one_or_none()
+        
+        if existing_product:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product with this slug already exists"
+            )
+    update_data = product_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(product, field, value)
+    
+    product.updated_at = datetime.utcnow()
+    
+    await db.commit()
+    await db.refresh(product)
+
+    return ProductOut(
+        id=product.id,
+        name=product.name,
+        description=product.description,
+        price=product.price,
+        quantity=product.quantity,
+        slug=product.slug,
+        status=product.status,
+        category_id=product.category_id,
+        created_at=product.created_at,
+        updated_at=product.updated_at
+    )
+
