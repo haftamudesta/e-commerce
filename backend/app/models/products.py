@@ -19,3 +19,16 @@ class Product(Base):
     
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     category = relationship("Category", back_populates="products")
+    
+class ProductImage(Base):
+    __tablename__ = "product_images"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    image_url = Column(String(500), nullable=False)
+    thumbnail_url = Column(String(500), nullable=True)
+    alt_text = Column(String(200), nullable=True)
+    is_primary = Column(Boolean, default=False)
+    display_order = Column(Integer, default=0)
+    
+    product = relationship("Product", back_populates="images")
