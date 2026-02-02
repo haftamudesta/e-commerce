@@ -90,3 +90,100 @@ async def get_products(
         page=page,
         limit=limit
     )
+
+@router.get("/{product_id}", response_model=ProductWithCategory)
+async def get_product(
+    product_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get a specific product by ID with category details
+    """
+    result = await db.execute(
+        select(Product).options(selectinload(Product.category)).where(Product.id == product_id)
+    )
+    product = result.scalar_one_or_none()
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    product_data = {
+        "id": product.id,
+        "name": product.name,
+        "description": product.description,
+        "price": product.price,
+        "quantity": product.quantity,
+        "slug": product.slug,
+        "status": product.status,
+        "category_id": product.category_id,
+        "created_at": product.created_at,
+        "updated_at": product.updated_at,
+    }
+    if product.category:
+        from app.schemas.categories import CategoryOut
+        product_data["category"] = CategoryOut(
+            id=product.category.id,
+            name=product.category.name
+        )
+    
+    return ProductWithCategory(**product_data)
+
+@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
+async def create_product(
+    product: ProductCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Create a new product (Admin/Seller only)
+    """
+    # Check if category exists
+    if product.category_id:
+        result = await db.execute(
+            select(Category).where(Category.id == product.category_id)
+        )
+        category = result.scalar_one_or_none()
+    if not category:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Category not found"
+            )
+    
+    # Check if slug is unique
+    if product.slug:
+        result = await db.execute(
+            select(Product).where(Product.slug == product.slug)
+        )
+        existing_product = result.scalar_one_or_none()
+        if existing_product:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product with this slug already exists"
+            )
+    new_product = Product(
+        name=product.name,
+        description=product.description,
+        price=product.price,
+        quantity=product.quantity,
+        slug=product.slug,
+        status=product.status,
+        category_id=product.category_id
+    )
+    
+    db.add(new_product)
+    await db.commit()
+    await db.refresh(new_product)
+    return ProductOut(
+        id=new_product.id,
+        name=new_product.name,
+        description=new_product.description,
+        price=new_product.price,
+        quantity=new_product.quantity,
+        slug=new_product.slug,
+        status=new_product.status,
+        category_id=new_product.category_id,
+        created_at=new_product.created_at,
+        updated_at=new_product.updated_at
+    )
