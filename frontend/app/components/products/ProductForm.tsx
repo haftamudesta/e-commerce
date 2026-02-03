@@ -1,4 +1,3 @@
-// frontend/components/products/ProductForm.tsx
 "use client";
 
 import { useState, useEffect } from "react";

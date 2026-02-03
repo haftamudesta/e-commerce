@@ -59,6 +59,16 @@ class ProductSimpleOut(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
+class ProductImageSchema(BaseModel):
+    id: int
+    image_url: str
+    thumbnail_url: Optional[str] = None
+    alt_text: Optional[str] = None
+    is_primary: bool = False
+    display_order: int = 0
+    
+    model_config = ConfigDict(from_attributes=True)
+
 class ProductListResponse(BaseModel):
     products: List[ProductSimpleOut]
     total: int

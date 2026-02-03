@@ -18,8 +18,19 @@ class Product(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
+
     category = relationship("Category", back_populates="products")
+    images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
     
+    @property
+    def primary_image(self):
+        """Get primary image or first image"""
+        for image in self.images:
+            if image.is_primary:
+                return image
+        return self.images[0] if self.images else None
+    
+
 class ProductImage(Base):
     __tablename__ = "product_images"
     
@@ -30,5 +41,8 @@ class ProductImage(Base):
     alt_text = Column(String(200), nullable=True)
     is_primary = Column(Boolean, default=False)
     display_order = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    product = relationship("Product", back_populates="images")
+    product = relationship("Product", back_populates="images")  
+    
