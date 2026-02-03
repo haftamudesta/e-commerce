@@ -21,6 +21,13 @@ class Product(Base):
 
     category = relationship("Category", back_populates="products")
     images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
+    reviews = relationship("Review", back_populates="product", cascade="all, delete-orphan")
+
+    
+    @property
+    def review_count(self):
+        """Count of reviews"""
+        return len(self.reviews)
     
     @property
     def primary_image(self):
@@ -44,12 +51,6 @@ class ProductImage(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    product = relationship("Product", back_populates="images"),
+    product = relationship("Product", back_populates="images")
 
-    reviews = relationship("Review", back_populates="product", cascade="all, delete-orphan")
-
-    @property
-    def review_count(self):
-        """Count of reviews"""
-        return len(self.reviews)
     

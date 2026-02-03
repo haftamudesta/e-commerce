@@ -84,7 +84,7 @@ async def get_products(
             updated_at=product.updated_at
         )
         product_list.append(product_out)
-        page = (skip // limit) + 1 if limit > 0 else 1
+    page = (skip // limit) + 1 if limit > 0 else 1
     
     return ProductListResponse(
         products=product_list,
