@@ -6,13 +6,15 @@ from sqlalchemy.orm import selectinload
 import aiofiles
 import os
 from datetime import datetime
+from app.schemas.reviews import ReviewCreate, ReviewResponse
 
 from app.models.products import Product
 from app.models.categories import Category
 from app.schemas.products import ProductCreate, ProductUpdate, ProductOut, ProductListResponse, ProductWithCategory
 from app.database.database import get_db
-from app.api.users import require_roles
+from app.api.users import require_roles,get_current_user
 from app.models.users import User
+from app.models.reviews import Review
 
 router = APIRouter(prefix="/api/v1/products", tags=["products"])
 
@@ -82,7 +84,7 @@ async def get_products(
             updated_at=product.updated_at
         )
         product_list.append(product_out)
-        page = (skip // limit) + 1 if limit > 0 else 1
+    page = (skip // limit) + 1 if limit > 0 else 1
     
     return ProductListResponse(
         products=product_list,
@@ -369,3 +371,97 @@ async def search_products(
         )
         for product in products
     ]
+
+
+from app.schemas.reviews import ReviewCreate, ReviewResponse
+
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from typing import List
+from datetime import datetime
+
+@router.post("/{product_id}/reviews", response_model=ReviewResponse, status_code=201)
+async def create_product_review(
+    product_id: int,
+    review: ReviewCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a review for a specific product"""
+    
+    product = await db.execute(
+        select(Product).where(Product.id == product_id)
+    )
+    product = product.scalar_one_or_none()
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
+
+    existing_review = await db.execute(
+        select(Review).where(
+            Review.product_id == product_id,
+            Review.user_id == current_user.id
+        )
+    )
+    
+    if existing_review.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have already reviewed this product"
+        )
+    
+    if not (1 <= review.rating <= 5):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Rating must be between 1 and 5"
+        )
+    
+    db_review = Review(
+        **review.dict(),
+        product_id=product_id,
+        user_id=current_user.id,
+        created_at=datetime.utcnow(),
+        user=current_user  
+    )
+    
+    db.add(db_review)
+    await db.commit()
+    await db.refresh(db_review)
+    
+    return db_review
+
+
+@router.get("/{product_id}/reviews", response_model=List[ReviewResponse])
+async def get_product_reviews(
+    product_id: int,
+    skip: int = 0,
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get reviews for a specific product"""
+    
+    product = await db.execute(
+        select(Product).where(Product.id == product_id)
+    )
+    product = product.scalar_one_or_none()
+    
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
+    
+    result = await db.execute(
+        select(Review)
+        .where(Review.product_id == product_id)
+        .order_by(Review.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    
+    reviews = result.scalars().all()
+    
+    return reviews

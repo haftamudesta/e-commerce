@@ -27,7 +27,7 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 @router.post("/sign-up", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]):  # Fixed type
+async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]):  
     """
     Create new User
     """
