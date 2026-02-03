@@ -97,8 +97,6 @@ class ProductFilter(BaseModel):
 
 class ProductWithCategory(ProductOut):
     category: Optional['CategoryOut'] = None
-
-
 ProductWithCategory.model_rebuild()
 
 model_config = ConfigDict(from_attributes=True)
