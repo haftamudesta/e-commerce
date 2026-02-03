@@ -1,7 +1,8 @@
 from enum import Enum
 from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
-from typing import Optional, ClassVar
+from typing import Optional, ClassVar,List
 import re
+from .reviews import ReviewInUser
 
 class UserRole(str, Enum):
     USER = "user"
@@ -67,6 +68,8 @@ class UserOut(BaseModel):
     username:str
     email:str
     role:str
+    reviews: List[ReviewInUser] = []
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     access_token: str
