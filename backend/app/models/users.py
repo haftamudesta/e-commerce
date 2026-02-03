@@ -1,6 +1,7 @@
 from __future__ import annotations
 from sqlalchemy import Integer, Column, String
 from app.database.database import Base
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = "users"
@@ -10,3 +11,5 @@ class User(Base):
     email = Column(String(255), unique=True, index=True)
     hashed_password = Column(String(255))
     role = Column(String(50), default="user")
+
+    reviews = relationship("Review", back_populates="user", cascade="all, delete-orphan")

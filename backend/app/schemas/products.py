@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, validator, ConfigDict
 from decimal import Decimal
 from app.schemas.categories import CategoryOut
+from .reviews import ReviewInProduct
 
 class ProductBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
@@ -59,11 +60,26 @@ class ProductSimpleOut(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
+class ProductImageSchema(BaseModel):
+    id: int
+    image_url: str
+    thumbnail_url: Optional[str] = None
+    alt_text: Optional[str] = None
+    is_primary: bool = False
+    display_order: int = 0
+    
+    model_config = ConfigDict(from_attributes=True)
+
 class ProductListResponse(BaseModel):
     products: List[ProductSimpleOut]
     total: int
     page: int
     limit: int
+    images: List[ProductImageSchema] = []
+    reviews: List[ReviewInProduct] = []
+    average_rating: float = 0.0
+    review_count: int = 0
+    model_config = ConfigDict(from_attributes=True)
 
 class ProductFilter(BaseModel):
     category_id: Optional[int] = None
@@ -84,3 +100,5 @@ class ProductWithCategory(ProductOut):
 
 
 ProductWithCategory.model_rebuild()
+
+model_config = ConfigDict(from_attributes=True)

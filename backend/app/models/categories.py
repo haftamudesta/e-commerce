@@ -10,4 +10,5 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index = True)
     name = Column(String(255), unique=True, index=True)
     products = relationship("Product", back_populates="category", cascade="all, delete-orphan")
-    # parent = relationship("Category", remote_side=[id], backref="children")
+    parent = relationship("Category", remote_side=[id], backref="subcategories")
+    
