@@ -14,6 +14,7 @@ bin-release/
 *.apk
 
 # Python
+.pyc
 __pycache__/
 *.pyc
 *.pyo
