@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
+from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict,constr
 from typing import Optional, ClassVar,List
 import re
 from .reviews import ReviewInUser
@@ -8,15 +8,6 @@ class UserRole(str, Enum):
     USER = "user"
     ADMIN = "admin"
     MODERATOR = "moderator"
-
-class UserCreate(BaseModel):
-    username: str = Field(min_length=1, max_length=50)
-    email: EmailStr = Field(max_length=120)
-    password: str =Field(min_length=8)
-    role: UserRole = Field(default=UserRole.USER, example="user")
-
-
-
 
 class UserRole(str, Enum):
     USER = "user"
@@ -70,6 +61,24 @@ class UserOut(BaseModel):
     role:str
     reviews: List[ReviewInUser] = []
     model_config = ConfigDict(from_attributes=True)
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = Field(
+        default=None,
+        min_length=3,
+        max_length=50,
+        pattern="^[a-zA-Z0-9_]+$"
+    )
+    email: Optional[EmailStr] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = Field(
+        default=None,
+        min_length=8,
+        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$"
+    )
+    role: Optional[str] = None  # Only admins should be able to update this
+    
+    
 
 class Token(BaseModel):
     access_token: str
