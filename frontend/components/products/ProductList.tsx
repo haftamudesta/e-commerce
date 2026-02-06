@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useProducts } from "../../contexts/ProductContext";
-import { useCategories } from "../../contexts/CategoryContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useProducts } from "../../app/contexts/ProductContext";
+import { useCategories } from "../../app/contexts/CategoryContext";
+import { useAuth } from "../../app/contexts/AuthContext";
 import { Edit, Trash2, Plus, Eye, Filter, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";

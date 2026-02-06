@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useProducts } from "../../contexts/ProductContext";
-import { useCategories } from "../../contexts/CategoryContext";
+import { useProducts } from "../../app/contexts/ProductContext";
+import { useCategories } from "../../app/contexts/CategoryContext";
 import { Upload, X } from "lucide-react";
 
 const productSchema = z.object({

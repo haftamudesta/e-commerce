@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useProducts } from "../../contexts/ProductContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useProducts } from "../../app/contexts/ProductContext";
+import { useAuth } from "../../app/contexts/AuthContext";
 import {
   Edit,
   Trash2,

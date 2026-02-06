@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import ProductList from "../components/products/ProductList";
+import ProductList from "../../components/products/ProductList";
 import { Filter, Grid, List } from "lucide-react";
 import { useState } from "react";
 
