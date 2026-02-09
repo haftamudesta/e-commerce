@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import ProductDetail from "../../components/products/ProductDetail";
+import ProductDetail from "../../../components/products/ProductDetail";
 import { Suspense } from "react";
 
 function ProductPageContent() {

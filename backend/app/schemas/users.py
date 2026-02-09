@@ -67,16 +67,35 @@ class UserUpdate(BaseModel):
         default=None,
         min_length=3,
         max_length=50,
-        pattern="^[a-zA-Z0-9_]+$"
     )
     email: Optional[EmailStr] = None
     current_password: Optional[str] = None
     new_password: Optional[str] = Field(
         default=None,
         min_length=8,
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$"
     )
     role: Optional[str] = None  # Only admins should be able to update this
+
+    @field_validator('username')
+    @classmethod
+    def username_alphanumeric(cls, v: str) -> str:
+        if not re.match(r'^[a-zA-Z0-9_]+$', v):
+            raise ValueError('Username must be alphanumeric (letters, numbers, underscores only)')
+        return v
+    
+    @field_validator('username')
+    @classmethod
+    def validate_password(cls, v):
+        if v is not None:
+            if len(v) < 8:
+                raise ValueError('Password must be at least 8 characters long')
+            if not re.search(r'[a-z]', v):
+                raise ValueError('Password must contain at least one lowercase letter')
+            if not re.search(r'[A-Z]', v):
+                raise ValueError('Password must contain at least one uppercase letter')
+            if not re.search(r'\d', v):
+                raise ValueError('Password must contain at least one digit')
+        return v
     
     
 
