@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { productsAPI, Product, ProductsResponse } from "../lib/productApi";
+import { productsAPI, ProductsResponse, Product } from "@/app/lib/productApi";
 import { useAuth } from "./AuthContext";
 
 interface ProductsContextType {
