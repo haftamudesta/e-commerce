@@ -21,7 +21,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  console.log("user:", user);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);

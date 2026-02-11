@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,6 +12,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('access_token');
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,44 +21,140 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
+  (response) => {
+    return response;
+  },
+  async (error) => { 
+    if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/sign-in';
       }
     }
-    
     return Promise.reject(error);
   }
 );
 
 export const userAPI = {
-  login: (data: { username: string; password: string }) =>
-    api.post('/api/v1/users/log-in', data),
+  login: async (data: { username: string; password: string }) => {
+    const formData = new URLSearchParams();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/v1/users/log-in`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+    
+      if (response.data?.access_token) {
+        localStorage.setItem('access_token', response.data.access_token);
+      }
+      
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
   
-  signup: (data: any) => api.post('/api/v1/users/sign-up', data),
+  getProfile: async () => {
+    
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+      throw new Error('No authentication token');
+    }
+    
+    try {
+      const response = await api.get('/api/v1/users/profile');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
   
-  getProfile: () => api.get('/api/v1/users/profile'),
+  signup: async (data: { username: string; email: string; password: string; role?: string }) => {
+    console.log('📝 Signup:', { username: data.username, email: data.email });
+    return api.post('/api/v1/users/sign-up', data);
+  },
   
-  updateProfile: (data: any) => api.put('/api/v1/users/profile', data),
+  updateProfile: async (data: any) => {
+    console.log('✏️ Updating profile...');
+    return api.put('/api/v1/users/profile', data);
+  },
   
-  deleteAccount: (password: string) =>
-    api.delete('/api/v1/users/profile', { data: { password } }),
+  deleteAccount: async (password: string) => {
+    console.log('🗑️ Deleting account...');
+    return api.delete('/api/v1/users/profile', { data: { password } });
+  },
   
-  getProtected: () => api.get('/api/v1/users/protected'),
+  getProtected: async () => {
+    return api.get('/api/v1/users/protected');
+  },
   
-  getUserDashboard: () => api.get('/api/v1/users/user/dashboard'),
+  getUserDashboard: async () => {
+    return api.get('/api/v1/users/user/dashboard');
+  },
   
-  getAdminDashboard: () => api.get('/api/v1/users/admin/dashboard'),
+  getAdminDashboard: async () => {
+    return api.get('/api/v1/users/admin/dashboard');
+  },
   
-  getAllUsers: () => api.get('/api/v1/users/'),
+  getAllUsers: async () => {
+    return api.get('/api/v1/users/');
+  },
   
-  deleteUser: (userId: string) => api.delete(`/api/v1/users/${userId}`),
+  deleteUser: async (userId: string) => {
+    return api.delete(`/api/v1/users/${userId}`);
+  },
+};
+
+export const authUtils = {
+  setAuthData: (token: string, user: any) => {
+    console.log('💾 Storing auth data...');
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    console.log('✅ Auth data stored');
+  },
+  
+  clearAuthData: () => {
+    console.log('🗑️ Clearing auth data...');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    console.log('✅ Auth data cleared');
+  },
+  
+  getToken: (): string | null => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      return token;
+    }
+    return null;
+  },
+  
+  getUser: (): any | null => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          return JSON.parse(userStr);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  },
+  
+  isAuthenticated: (): boolean => {
+    return !!authUtils.getToken();
+  },
 };
 
 export default api;
