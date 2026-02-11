@@ -80,17 +80,14 @@ export const userAPI = {
   },
   
   signup: async (data: { username: string; email: string; password: string; role?: string }) => {
-    console.log('📝 Signup:', { username: data.username, email: data.email });
     return api.post('/api/v1/users/sign-up', data);
   },
   
   updateProfile: async (data: any) => {
-    console.log('✏️ Updating profile...');
     return api.put('/api/v1/users/profile', data);
   },
   
   deleteAccount: async (password: string) => {
-    console.log('🗑️ Deleting account...');
     return api.delete('/api/v1/users/profile', { data: { password } });
   },
   
