@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import { userAPI } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 interface User {
@@ -21,7 +22,13 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (token: string, userData: User) => void;
+  login: (username: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    email: string,
+    password: string,
+    role?: string,
+  ) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
 }
@@ -51,11 +58,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (newToken: string, userData: User) => {
-    localStorage.setItem("access_token", newToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setToken(newToken);
-    setUser(userData);
+  const login = async (username: string, password: string) => {
+    try {
+      const response = await userAPI.login({ username, password });
+      const { access_token } = response.data;
+
+      const profileResponse = await userAPI.getProfile();
+      const userData = profileResponse.data;
+
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setToken(access_token);
+      setUser(userData);
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Login failed",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const register = async (
+    username: string,
+    email: string,
+    password: string,
+    role: string = "user",
+  ) => {
+    try {
+      const signupData = { username, email, password, role };
+      const signupResponse = await userAPI.signup(signupData);
+
+      const loginResponse = await userAPI.login({ username, password });
+      const { access_token } = loginResponse.data;
+      const userData = signupResponse.data;
+
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setToken(access_token);
+      setUser(userData);
+
+      toast({
+        title: "Success",
+        description: "Account created successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Registration failed",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -80,7 +140,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, logout, updateUser }}
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        register,
+        logout,
+        updateUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
