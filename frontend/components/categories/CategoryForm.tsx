@@ -1,10 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCategories } from "../../contexts/CategoryContext";
+import { useCategories } from "@/contexts/CategoryContext";
 
 const categorySchema = z.object({
   name: z
@@ -45,6 +46,7 @@ export default function CategoryFormContext({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const onSubmit = async (data: CategoryFormData) => {
     setIsSubmitting(true);
@@ -55,6 +57,7 @@ export default function CategoryFormContext({
         await createCategory(data.name);
       }
       onSuccess?.();
+      router.push("/categories");
     } catch (error) {
       console.error("Error in form submission:", error);
     } finally {

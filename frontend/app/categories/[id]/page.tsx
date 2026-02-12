@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import CategoryDetailContext from "../../components/categories/CategoryDetail";
+import CategoryDetailContext from "@/components/categories/CategoryDetail";
 import { Suspense } from "react";
 
 function CategoryPageContent() {
