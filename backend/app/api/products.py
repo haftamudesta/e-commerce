@@ -10,7 +10,7 @@ from uuid import uuid4
 from datetime import datetime
 from app.schemas.reviews import ReviewCreate, ReviewResponse
 
-from app.models.products import Product, ProductImage  # Make sure ProductImage is imported
+from app.models.products import Product, ProductImage 
 from app.models.categories import Category
 from app.schemas.products import (
     ProductCreate, 
@@ -18,7 +18,7 @@ from app.schemas.products import (
     ProductOut, 
     ProductListResponse, 
     ProductWithCategory,
-    ProductImageSchema  # Add this to your schemas
+    ProductImageSchema 
 )
 from app.database.database import get_db
 from app.api.users import require_roles, get_current_user
@@ -30,7 +30,6 @@ router = APIRouter(prefix="/api/v1/products", tags=["products"])
 UPLOAD_DIR = "uploads/products"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# ============ EXISTING PRODUCT ENDPOINTS ============
 
 @router.get("/", response_model=ProductListResponse)
 async def get_products(
@@ -162,7 +161,6 @@ async def create_product(
     """
     Create a new product (Admin/Seller only)
     """
-    # Check if category exists
     if product.category_id:
         result = await db.execute(
             select(Category).where(Category.id == product.category_id)
@@ -174,7 +172,6 @@ async def create_product(
                 detail="Category not found"
             )
     
-    # Check if slug is unique
     if product.slug:
         result = await db.execute(
             select(Product).where(Product.slug == product.slug)
@@ -404,7 +401,6 @@ async def search_products(
         for product in products
     ]
 
-# ============ PRODUCT IMAGE ENDPOINTS ============
 
 @router.post("/{product_id}/images", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def upload_product_image(
@@ -419,7 +415,6 @@ async def upload_product_image(
     """
     Upload a single image for a product
     """
-    # Check if product exists
     product = await db.get(Product, product_id)
     if not product:
         raise HTTPException(
@@ -427,19 +422,16 @@ async def upload_product_image(
             detail=f"Product with id {product_id} not found"
         )
     
-    # Validate file type
     if not file.content_type.startswith('image/'):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="File must be an image"
         )
     
-    # Generate unique filename
     file_extension = os.path.splitext(file.filename)[1]
     filename = f"{uuid4()}{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, filename)
-    
-    # Save file
+  
     try:
         async with aiofiles.open(file_path, 'wb') as out_file:
             content = await file.read()
@@ -450,18 +442,16 @@ async def upload_product_image(
             detail=f"Could not save file: {str(e)}"
         )
     
-    # Generate thumbnail URL (you can add thumbnail generation later)
+    
     thumbnail_filename = f"thumb_{filename}"
     thumbnail_path = os.path.join(UPLOAD_DIR, thumbnail_filename)
     
-    # For now, copy the same file as thumbnail
     try:
         async with aiofiles.open(thumbnail_path, 'wb') as out_file:
             await out_file.write(content)
     except:
         thumbnail_filename = filename
     
-    # If this image is set as primary, remove primary from other images
     if is_primary:
         await db.execute(
             ProductImage.__table__.update()
@@ -469,7 +459,6 @@ async def upload_product_image(
             .values(is_primary=False)
         )
     
-    # Create image record
     image = ProductImage(
         product_id=product_id,
         image_url=f"/{UPLOAD_DIR}/{filename}",
@@ -503,7 +492,6 @@ async def upload_product_images_bulk(
     """
     Upload multiple images for a product
     """
-    # Check if product exists
     product = await db.get(Product, product_id)
     if not product:
         raise HTTPException(
@@ -511,7 +499,6 @@ async def upload_product_images_bulk(
             detail=f"Product with id {product_id} not found"
         )
     
-    # Get current max display order
     result = await db.execute(
         select(func.max(ProductImage.display_order))
         .where(ProductImage.product_id == product_id)
@@ -521,24 +508,20 @@ async def upload_product_images_bulk(
     uploaded_images = []
     
     for i, file in enumerate(files):
-        # Skip non-image files
         if not file.content_type.startswith('image/'):
             continue
         
-        # Generate unique filename
         file_extension = os.path.splitext(file.filename)[1]
         filename = f"{uuid4()}{file_extension}"
         file_path = os.path.join(UPLOAD_DIR, filename)
         
-        # Save file
         try:
             async with aiofiles.open(file_path, 'wb') as out_file:
                 content = await file.read()
                 await out_file.write(content)
         except Exception as e:
             continue
-        
-        # Set first image as primary if no primary exists
+     
         existing_primary = await db.execute(
             select(ProductImage).where(
                 ProductImage.product_id == product_id,
@@ -548,11 +531,10 @@ async def upload_product_images_bulk(
         has_primary = existing_primary.scalar_one_or_none() is not None
         is_primary = (i == 0 and not has_primary)
         
-        # Create image record
         image = ProductImage(
             product_id=product_id,
             image_url=f"/{UPLOAD_DIR}/{filename}",
-            thumbnail_url=f"/{UPLOAD_DIR}/{filename}",  # You can add thumbnail generation later
+            thumbnail_url=f"/{UPLOAD_DIR}/{filename}",  # add thumbnail generation later
             alt_text=product.name,
             is_primary=is_primary,
             display_order=max_order + i + 1
@@ -563,7 +545,6 @@ async def upload_product_images_bulk(
     
     await db.commit()
     
-    # Refresh images
     for image in uploaded_images:
         await db.refresh(image)
     
@@ -597,7 +578,6 @@ async def delete_product_image(
             detail=f"Image with id {image_id} not found"
         )
     
-    # Delete physical file
     try:
         file_path = image.image_url.lstrip('/')
         if os.path.exists(file_path):
@@ -631,15 +611,13 @@ async def set_primary_image(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Image with id {image_id} not found"
         )
-    
-    # Remove primary from other images
+ 
     await db.execute(
         ProductImage.__table__.update()
         .where(ProductImage.product_id == image.product_id)
         .values(is_primary=False)
     )
     
-    # Set this image as primary
     image.is_primary = True
     await db.commit()
     await db.refresh(image)
@@ -695,7 +673,6 @@ async def reorder_product_images(
     """
     Reorder product images
     """
-    # Verify product exists
     product = await db.get(Product, product_id)
     if not product:
         raise HTTPException(
@@ -703,7 +680,6 @@ async def reorder_product_images(
             detail=f"Product with id {product_id} not found"
         )
     
-    # Update display orders
     for order_item in image_order:
         await db.execute(
             ProductImage.__table__.update()
@@ -718,7 +694,6 @@ async def reorder_product_images(
     
     await db.commit()
     
-    # Get updated images
     result = await db.execute(
         select(ProductImage)
         .where(ProductImage.product_id == product_id)
@@ -735,8 +710,6 @@ async def reorder_product_images(
         }
         for img in images
     ]
-
-# ============ REVIEW ENDPOINTS ============
 
 @router.post("/{product_id}/reviews", response_model=ReviewResponse, status_code=201)
 async def create_product_review(
