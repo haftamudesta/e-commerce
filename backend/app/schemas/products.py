@@ -67,6 +67,7 @@ class ProductImageSchema(BaseModel):
     alt_text: Optional[str] = None
     is_primary: bool = False
     display_order: int = 0
+    product_id: int
     
     model_config = ConfigDict(from_attributes=True)
 
