@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { categoriesAPI, Category } from "@/app/lib/categoryApi";
+import { categoriesAPI, Category } from "@/lib/categoryApi";
 import { useAuth } from "./AuthContext";
 
 interface CategoriesContextType {
