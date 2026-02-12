@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.api.users import router as users_router;
 from app.api.categories import router as category_router;
@@ -35,6 +37,12 @@ app.add_middleware(
     allow_methods=["*"],# Allow all methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],#Allow all headers
 )
+
+os.makedirs("uploads/products", exist_ok=True)
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+
 app.include_router(users_router)
 app.include_router(category_router)
 app.include_router(product_router)

@@ -1,18 +1,27 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import selectinload
 import aiofiles
 import os
+import shutil
+from uuid import uuid4
 from datetime import datetime
 from app.schemas.reviews import ReviewCreate, ReviewResponse
 
-from app.models.products import Product
+from app.models.products import Product, ProductImage  # Make sure ProductImage is imported
 from app.models.categories import Category
-from app.schemas.products import ProductCreate, ProductUpdate, ProductOut, ProductListResponse, ProductWithCategory
+from app.schemas.products import (
+    ProductCreate, 
+    ProductUpdate, 
+    ProductOut, 
+    ProductListResponse, 
+    ProductWithCategory,
+    ProductImageSchema  # Add this to your schemas
+)
 from app.database.database import get_db
-from app.api.users import require_roles,get_current_user
+from app.api.users import require_roles, get_current_user
 from app.models.users import User
 from app.models.reviews import Review
 
@@ -20,6 +29,8 @@ router = APIRouter(prefix="/api/v1/products", tags=["products"])
 
 UPLOAD_DIR = "uploads/products"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# ============ EXISTING PRODUCT ENDPOINTS ============
 
 @router.get("/", response_model=ProductListResponse)
 async def get_products(
@@ -35,8 +46,7 @@ async def get_products(
     """
     Get all products with pagination and filtering
     """
-
-    query = select(Product)
+    query = select(Product).options(selectinload(Product.images))
     
     if category_id:
         query = query.where(Product.category_id == category_id)
@@ -57,17 +67,20 @@ async def get_products(
                 Product.description.ilike(search_term)
             )
         )
-    count_query = select(func.count(Product.id))
+    
+    count_query = select(func.count()).select_from(Product)
     if category_id:
         count_query = count_query.where(Product.category_id == category_id)
+    if status:
+        count_query = count_query.where(Product.status == status)
     
     count_result = await db.execute(count_query)
-    total = count_result.scalar()
+    total = count_result.scalar() or 0
     
     result = await db.execute(
         query.offset(skip).limit(limit).order_by(Product.created_at.desc())
     )
-    products = result.scalars().all()
+    products = result.scalars().unique().all()
 
     product_list = []
     for product in products:
@@ -84,6 +97,7 @@ async def get_products(
             updated_at=product.updated_at
         )
         product_list.append(product_out)
+    
     page = (skip // limit) + 1 if limit > 0 else 1
     
     return ProductListResponse(
@@ -102,7 +116,12 @@ async def get_product(
     Get a specific product by ID with category details
     """
     result = await db.execute(
-        select(Product).options(selectinload(Product.category)).where(Product.id == product_id)
+        select(Product)
+        .options(
+            selectinload(Product.category),
+            selectinload(Product.images)
+        )
+        .where(Product.id == product_id)
     )
     product = result.scalar_one_or_none()
     
@@ -111,6 +130,7 @@ async def get_product(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found"
         )
+    
     product_data = {
         "id": product.id,
         "name": product.name,
@@ -123,6 +143,7 @@ async def get_product(
         "created_at": product.created_at,
         "updated_at": product.updated_at,
     }
+    
     if product.category:
         from app.schemas.categories import CategoryOut
         product_data["category"] = CategoryOut(
@@ -147,7 +168,7 @@ async def create_product(
             select(Category).where(Category.id == product.category_id)
         )
         category = result.scalar_one_or_none()
-    if not category:
+        if not category:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Category not found"
@@ -164,6 +185,7 @@ async def create_product(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product with this slug already exists"
             )
+    
     new_product = Product(
         name=product.name,
         description=product.description,
@@ -177,6 +199,7 @@ async def create_product(
     db.add(new_product)
     await db.commit()
     await db.refresh(new_product)
+    
     return ProductOut(
         id=new_product.id,
         name=new_product.name,
@@ -210,6 +233,7 @@ async def update_product(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found"
         )
+    
     if product_update.category_id is not None:
         result = await db.execute(
             select(Category).where(Category.id == product_update.category_id)
@@ -221,6 +245,7 @@ async def update_product(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Category not found"
             )
+    
     if product_update.slug and product_update.slug != product.slug:
         result = await db.execute(
             select(Product).where(Product.slug == product_update.slug)
@@ -232,6 +257,7 @@ async def update_product(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product with this slug already exists"
             )
+    
     update_data = product_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(product, field, value)
@@ -267,6 +293,7 @@ async def delete_product(
         select(Product).where(Product.id == product_id)
     )
     product = result.scalar_one_or_none()
+    
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -292,6 +319,7 @@ async def get_products_by_category(
         select(Category).where(Category.id == category_id)
     )
     category = result.scalar_one_or_none()
+    
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -300,16 +328,19 @@ async def get_products_by_category(
     
     result = await db.execute(
         select(Product)
+        .options(selectinload(Product.images))
         .where(Product.category_id == category_id)
         .offset(skip)
         .limit(limit)
         .order_by(Product.created_at.desc())
     )
-    products = result.scalars().all()
+    products = result.scalars().unique().all()
+    
     count_result = await db.execute(
-        select(func.count(Product.id)).where(Product.category_id == category_id)
+        select(func.count()).select_from(Product).where(Product.category_id == category_id)
     )
-    total = count_result.scalar()
+    total = count_result.scalar() or 0
+    
     product_list = []
     for product in products:
         product_out = ProductOut(
@@ -327,6 +358,7 @@ async def get_products_by_category(
         product_list.append(product_out)
     
     page = (skip // limit) + 1 if limit > 0 else 1
+    
     return ProductListResponse(
         products=product_list,
         total=total,
@@ -372,13 +404,339 @@ async def search_products(
         for product in products
     ]
 
+# ============ PRODUCT IMAGE ENDPOINTS ============
 
-from app.schemas.reviews import ReviewCreate, ReviewResponse
+@router.post("/{product_id}/images", response_model=dict, status_code=status.HTTP_201_CREATED)
+async def upload_product_image(
+    product_id: int,
+    file: UploadFile = File(...),
+    is_primary: bool = Form(False),
+    display_order: int = Form(0),
+    alt_text: Optional[str] = Form(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Upload a single image for a product
+    """
+    # Check if product exists
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
+    
+    # Validate file type
+    if not file.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image"
+        )
+    
+    # Generate unique filename
+    file_extension = os.path.splitext(file.filename)[1]
+    filename = f"{uuid4()}{file_extension}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    
+    # Save file
+    try:
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Could not save file: {str(e)}"
+        )
+    
+    # Generate thumbnail URL (you can add thumbnail generation later)
+    thumbnail_filename = f"thumb_{filename}"
+    thumbnail_path = os.path.join(UPLOAD_DIR, thumbnail_filename)
+    
+    # For now, copy the same file as thumbnail
+    try:
+        async with aiofiles.open(thumbnail_path, 'wb') as out_file:
+            await out_file.write(content)
+    except:
+        thumbnail_filename = filename
+    
+    # If this image is set as primary, remove primary from other images
+    if is_primary:
+        await db.execute(
+            ProductImage.__table__.update()
+            .where(ProductImage.product_id == product_id)
+            .values(is_primary=False)
+        )
+    
+    # Create image record
+    image = ProductImage(
+        product_id=product_id,
+        image_url=f"/{UPLOAD_DIR}/{filename}",
+        thumbnail_url=f"/{UPLOAD_DIR}/{thumbnail_filename}",
+        alt_text=alt_text or product.name,
+        is_primary=is_primary,
+        display_order=display_order
+    )
+    
+    db.add(image)
+    await db.commit()
+    await db.refresh(image)
+    
+    return {
+        "id": image.id,
+        "image_url": image.image_url,
+        "thumbnail_url": image.thumbnail_url,
+        "alt_text": image.alt_text,
+        "is_primary": image.is_primary,
+        "display_order": image.display_order,
+        "product_id": image.product_id
+    }
 
-from fastapi import HTTPException, status
-from sqlalchemy import select
-from typing import List
-from datetime import datetime
+@router.post("/{product_id}/images/bulk", response_model=List[dict], status_code=status.HTTP_201_CREATED)
+async def upload_product_images_bulk(
+    product_id: int,
+    files: List[UploadFile] = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Upload multiple images for a product
+    """
+    # Check if product exists
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
+    
+    # Get current max display order
+    result = await db.execute(
+        select(func.max(ProductImage.display_order))
+        .where(ProductImage.product_id == product_id)
+    )
+    max_order = result.scalar() or 0
+    
+    uploaded_images = []
+    
+    for i, file in enumerate(files):
+        # Skip non-image files
+        if not file.content_type.startswith('image/'):
+            continue
+        
+        # Generate unique filename
+        file_extension = os.path.splitext(file.filename)[1]
+        filename = f"{uuid4()}{file_extension}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        
+        # Save file
+        try:
+            async with aiofiles.open(file_path, 'wb') as out_file:
+                content = await file.read()
+                await out_file.write(content)
+        except Exception as e:
+            continue
+        
+        # Set first image as primary if no primary exists
+        existing_primary = await db.execute(
+            select(ProductImage).where(
+                ProductImage.product_id == product_id,
+                ProductImage.is_primary == True
+            )
+        )
+        has_primary = existing_primary.scalar_one_or_none() is not None
+        is_primary = (i == 0 and not has_primary)
+        
+        # Create image record
+        image = ProductImage(
+            product_id=product_id,
+            image_url=f"/{UPLOAD_DIR}/{filename}",
+            thumbnail_url=f"/{UPLOAD_DIR}/{filename}",  # You can add thumbnail generation later
+            alt_text=product.name,
+            is_primary=is_primary,
+            display_order=max_order + i + 1
+        )
+        
+        db.add(image)
+        uploaded_images.append(image)
+    
+    await db.commit()
+    
+    # Refresh images
+    for image in uploaded_images:
+        await db.refresh(image)
+    
+    return [
+        {
+            "id": img.id,
+            "image_url": img.image_url,
+            "thumbnail_url": img.thumbnail_url,
+            "alt_text": img.alt_text,
+            "is_primary": img.is_primary,
+            "display_order": img.display_order,
+            "product_id": img.product_id
+        }
+        for img in uploaded_images
+    ]
+
+@router.delete("/product-images/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product_image(
+    image_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Delete a product image
+    """
+    image = await db.get(ProductImage, image_id)
+    
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image with id {image_id} not found"
+        )
+    
+    # Delete physical file
+    try:
+        file_path = image.image_url.lstrip('/')
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        if image.thumbnail_url:
+            thumb_path = image.thumbnail_url.lstrip('/')
+            if os.path.exists(thumb_path):
+                os.remove(thumb_path)
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+    
+    await db.delete(image)
+    await db.commit()
+    
+    return None
+
+@router.patch("/product-images/{image_id}/set-primary", response_model=dict)
+async def set_primary_image(
+    image_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Set an image as the primary image for its product
+    """
+    image = await db.get(ProductImage, image_id)
+    
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image with id {image_id} not found"
+        )
+    
+    # Remove primary from other images
+    await db.execute(
+        ProductImage.__table__.update()
+        .where(ProductImage.product_id == image.product_id)
+        .values(is_primary=False)
+    )
+    
+    # Set this image as primary
+    image.is_primary = True
+    await db.commit()
+    await db.refresh(image)
+    
+    return {
+        "id": image.id,
+        "is_primary": image.is_primary,
+        "product_id": image.product_id
+    }
+
+@router.patch("/product-images/{image_id}", response_model=dict)
+async def update_product_image(
+    image_id: int,
+    alt_text: Optional[str] = Form(None),
+    display_order: Optional[int] = Form(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Update product image metadata
+    """
+    image = await db.get(ProductImage, image_id)
+    
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image with id {image_id} not found"
+        )
+    
+    if alt_text is not None:
+        image.alt_text = alt_text
+    
+    if display_order is not None:
+        image.display_order = display_order
+    
+    await db.commit()
+    await db.refresh(image)
+    
+    return {
+        "id": image.id,
+        "alt_text": image.alt_text,
+        "display_order": image.display_order,
+        "is_primary": image.is_primary
+    }
+
+@router.patch("/{product_id}/images/reorder", response_model=List[dict])
+async def reorder_product_images(
+    product_id: int,
+    image_order: List[dict],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles(["admin", "seller"]))
+):
+    """
+    Reorder product images
+    """
+    # Verify product exists
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found"
+        )
+    
+    # Update display orders
+    for order_item in image_order:
+        await db.execute(
+            ProductImage.__table__.update()
+            .where(
+                and_(
+                    ProductImage.id == order_item["id"],
+                    ProductImage.product_id == product_id
+                )
+            )
+            .values(display_order=order_item["display_order"])
+        )
+    
+    await db.commit()
+    
+    # Get updated images
+    result = await db.execute(
+        select(ProductImage)
+        .where(ProductImage.product_id == product_id)
+        .order_by(ProductImage.display_order)
+    )
+    images = result.scalars().all()
+    
+    return [
+        {
+            "id": img.id,
+            "display_order": img.display_order,
+            "image_url": img.image_url,
+            "is_primary": img.is_primary
+        }
+        for img in images
+    ]
+
+# ============ REVIEW ENDPOINTS ============
 
 @router.post("/{product_id}/reviews", response_model=ReviewResponse, status_code=201)
 async def create_product_review(
@@ -420,11 +778,10 @@ async def create_product_review(
         )
     
     db_review = Review(
-        **review.dict(),
+        **review.model_dump(),
         product_id=product_id,
         user_id=current_user.id,
-        created_at=datetime.utcnow(),
-        user=current_user  
+        created_at=datetime.utcnow()
     )
     
     db.add(db_review)
@@ -432,7 +789,6 @@ async def create_product_review(
     await db.refresh(db_review)
     
     return db_review
-
 
 @router.get("/{product_id}/reviews", response_model=List[ReviewResponse])
 async def get_product_reviews(
@@ -456,6 +812,7 @@ async def get_product_reviews(
     
     result = await db.execute(
         select(Review)
+        .options(selectinload(Review.user))
         .where(Review.product_id == product_id)
         .order_by(Review.created_at.desc())
         .offset(skip)
