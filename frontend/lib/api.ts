@@ -114,17 +114,14 @@ export const userAPI = {
 
 export const authUtils = {
   setAuthData: (token: string, user: any) => {
-    console.log('💾 Storing auth data...');
     localStorage.setItem('access_token', token);
     localStorage.setItem('user', JSON.stringify(user));
-    console.log('✅ Auth data stored');
+   
   },
   
   clearAuthData: () => {
-    console.log('🗑️ Clearing auth data...');
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
-    console.log('✅ Auth data cleared');
   },
   
   getToken: (): string | null => {
@@ -153,5 +150,4 @@ export const authUtils = {
     return !!authUtils.getToken();
   },
 };
-
 export default api;
