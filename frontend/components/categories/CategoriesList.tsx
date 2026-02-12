@@ -93,7 +93,7 @@ export default function CategoryListContext({
           <p className="text-gray-500">No categories found</p>
           {user?.role === "admin" && (
             <Link
-              href="/admin/categories/new"
+              href="/categories/new"
               className="inline-block mt-4 text-blue-600 hover:text-blue-800"
             >
               Create your first category
