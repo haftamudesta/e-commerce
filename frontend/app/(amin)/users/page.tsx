@@ -170,7 +170,7 @@ export default function AdminUsersPage() {
                           <div>
                             <div className="font-medium">{user.username}</div>
                             <div className="text-sm text-muted-foreground">
-                              ID: {user.id.slice(0, 8)}...
+                              ID: {user.id}
                             </div>
                           </div>
                         </div>
