@@ -195,7 +195,7 @@ async def get_all_users(
     Get all users (admin only).
     """
     result = await db.execute(
-        select(User).offset(skip).limit(limit).order_by(User.created_at.desc())
+        select(User).offset(skip).limit(limit)
     )
     users = result.scalars().all()
     
@@ -205,10 +205,12 @@ async def get_all_users(
             "username": user.username,
             "email": user.email,
             "role": user.role,
-            "created_at": user.created_at.isoformat() if hasattr(user, 'created_at') else None
         }
         for user in users
     ]
+
+
+
 
 @router.put("/profile", response_model=UserOut)
 async def update_profile(
