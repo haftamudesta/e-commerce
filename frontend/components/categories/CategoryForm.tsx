@@ -1,4 +1,3 @@
-// frontend/components/categories/CategoryFormContext.tsx
 "use client";
 
 import { useState } from "react";

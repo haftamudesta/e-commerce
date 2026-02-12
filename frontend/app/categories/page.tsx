@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CategoryList from "../components/categories/CategoriesList";
-import CategoryForm from "../components/categories/CategoryForm";
+import CategoryList from "@/components/categories/CategoriesList";
+import CategoryForm from "@/components/categories/CategoryForm";
 import { Search } from "lucide-react";
-import { useCategories } from "../contexts/CategoryContext";
+import { useCategories } from "@/contexts/CategoryContext";
 
 export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState("");
