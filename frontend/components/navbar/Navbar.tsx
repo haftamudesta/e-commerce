@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, User, Shield, Home, Settings } from "lucide-react";
+import { LogOut, User, ShoppingBag, Home, Settings } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -31,38 +31,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="border-b">
+    <nav
+      className="border-b"
+      style={{
+        background: "linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%)",
+      }}
+    >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">AuthSystem</span>
+            <ShoppingBag size={32} strokeWidth={1.5} absoluteStrokeWidth />
+            <span className="font-bold text-xl">E-Commerce App</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/">
-              <Button
-                variant={pathname === "/" ? "default" : "ghost"}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Home className="h-4 w-4" />
-                Home
-              </Button>
-            </Link>
-
-            {user && (
-              <Link href="/profile">
-                <Button
-                  variant={pathname === "/profile" ? "default" : "ghost"}
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <User className="h-4 w-4" />
-                  Profile
-                </Button>
-              </Link>
-            )}
+            <Link href="/">Home</Link>
 
             {user?.role === "admin" && (
               <Link href="/admin/users">
@@ -85,10 +68,10 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
+                  className="relative h-8 w-8 rounded-full bg-sky-700"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback>
+                    <AvatarFallback className="text-3xl font-bold text-purple-600 p-2">
                       {user?.username?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
