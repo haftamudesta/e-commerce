@@ -79,7 +79,7 @@ export default function CategoryListContext({
         </h2>
         {user?.role === "admin" && (
           <Link
-            href="/categories/new"
+            href="/dashboard/categories/new"
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
           >
             <Plus size={20} />
@@ -93,7 +93,7 @@ export default function CategoryListContext({
           <p className="text-gray-500">No categories found</p>
           {user?.role === "admin" && (
             <Link
-              href="/categories/new"
+              href="dashboard/categories/new"
               className="inline-block mt-4 text-blue-600 hover:text-blue-800"
             >
               Create your first category
@@ -126,7 +126,7 @@ export default function CategoryListContext({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
-                      href={`/categories/${category.id}`}
+                      href={`/dashboard/categories/${category.id}`}
                       className="text-blue-600 hover:text-blue-900 font-medium"
                     >
                       {category.name}
