@@ -1,9 +1,11 @@
-import { useAuth } from "./contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Home() {
   return (
-    <main>
-      <h1>Ecommerce App</h1>
-    </main>
+    <ProtectedRoute>
+      <main>
+        <h1>Ecommerce App</h1>
+      </main>
+    </ProtectedRoute>
   );
 }
