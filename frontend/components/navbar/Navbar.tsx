@@ -32,7 +32,6 @@ export default function Navbar() {
 
   return (
     <nav
-      className="border-b"
       style={{
         background: "linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%)",
       }}

@@ -3,13 +3,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ProfileUpdateFormData,
-  profileUpdateSchema,
-} from "../../lib/validation";
-import { userAPI } from "../../lib/api";
+import { ProfileUpdateFormData, profileUpdateSchema } from "@/lib/validation";
+import { userAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "../../hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, User, Mail, KeyRound, Shield } from "lucide-react";
-import DeleteAccountDialog from "../../components/profile/DeleteAccountDialog";
+import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
