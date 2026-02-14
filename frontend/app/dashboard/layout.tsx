@@ -12,7 +12,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div>
         <SideBar />
       </div>
-      <main className="flex-1 overflow-auto">
+      <main
+        className="flex-1 min-w-full overflow-auto"
+        style={{
+          background:
+            "linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%)",
+        }}
+      >
         <div>{children}</div>
       </main>
     </div>

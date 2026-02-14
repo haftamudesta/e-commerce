@@ -54,7 +54,6 @@ export default function ProductList({
   const { categories } = useCategories();
   const { user } = useAuth();
 
-  // ============ STATE ============
   const [filters, setFilters] = useState({
     status: "",
     minPrice: "",
@@ -68,9 +67,6 @@ export default function ProductList({
   );
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
-  // ============ EFFECTS ============
-
-  // Initial fetch
   useEffect(() => {
     fetchProducts({
       page: initialPage,
@@ -79,12 +75,9 @@ export default function ProductList({
     });
   }, [categoryId, initialPage, initialLimit, fetchProducts]);
 
-  // Update selected category when prop changes
   useEffect(() => {
     setSelectedCategory(categoryId?.toString() || "");
   }, [categoryId]);
-
-  // ============ HANDLERS ============
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -174,8 +167,6 @@ export default function ProductList({
     }
   };
 
-  // ============ UTILITIES ============
-
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "published":
@@ -213,9 +204,6 @@ export default function ProductList({
   const totalPages = Math.ceil(total / limit);
   const canAddProduct = user?.role === "admin" || user?.role === "seller";
 
-  // ============ RENDER ============
-
-  // Loading State
   if (loading && products.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center h-64 space-y-4">
@@ -225,7 +213,6 @@ export default function ProductList({
     );
   }
 
-  // Error State
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -256,7 +243,6 @@ export default function ProductList({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Products</h1>
@@ -292,7 +278,7 @@ export default function ProductList({
 
           {canAddProduct && (
             <Link
-              href="/products/new"
+              href="/dashboard/products/new"
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Plus size={20} />
@@ -302,7 +288,6 @@ export default function ProductList({
         </div>
       </div>
 
-      {/* Filters Panel */}
       {showFilters && showFilterPanel && (
         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
           <div className="flex justify-between items-center mb-4">
@@ -318,7 +303,6 @@ export default function ProductList({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Search */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Search
@@ -335,8 +319,6 @@ export default function ProductList({
                 />
               </div>
             </div>
-
-            {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category
@@ -354,8 +336,6 @@ export default function ProductList({
                 ))}
               </select>
             </div>
-
-            {/* Status Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -372,7 +352,6 @@ export default function ProductList({
               </select>
             </div>
 
-            {/* Price Range */}
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -438,7 +417,6 @@ export default function ProductList({
         </div>
       )}
 
-      {/* Products Grid */}
       {products.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
           <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -450,7 +428,7 @@ export default function ProductList({
           </p>
           {canAddProduct && (
             <Link
-              href="/products/new"
+              href="/dashboard/products/new"
               className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               <Plus size={20} />
@@ -470,9 +448,8 @@ export default function ProductList({
                   key={product.id}
                   className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                 >
-                  {/* Image Container */}
                   <Link
-                    href={`/products/${product.id}`}
+                    href={`/dashboard/products/${product.id}`}
                     className="block relative"
                   >
                     <div className="relative h-56 bg-gray-100 overflow-hidden">
@@ -501,8 +478,6 @@ export default function ProductList({
                           </span>
                         </div>
                       )}
-
-                      {/* Status Badge */}
                       <div className="absolute top-3 right-3">
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(product.status)}`}
@@ -510,8 +485,6 @@ export default function ProductList({
                           {getStatusLabel(product.status)}
                         </span>
                       </div>
-
-                      {/* Stock Badge */}
                       <div className="absolute bottom-3 left-3">
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -529,10 +502,7 @@ export default function ProductList({
                       </div>
                     </div>
                   </Link>
-
-                  {/* Content */}
                   <div className="p-5">
-                    {/* Category */}
                     {product.category && (
                       <div className="mb-2">
                         <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
@@ -540,9 +510,7 @@ export default function ProductList({
                         </span>
                       </div>
                     )}
-
-                    {/* Product Name */}
-                    <Link href={`/products/${product.id}`}>
+                    <Link href={`/dashboard/products/${product.id}`}>
                       <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 transition-colors line-clamp-2">
                         {product.name}
                       </h3>
@@ -568,7 +536,7 @@ export default function ProductList({
                     {/* Actions */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <Link
-                        href={`/products/${product.id}`}
+                        href={`/dashboard/products/${product.id}`}
                         className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                       >
                         <Eye size={18} />
@@ -578,7 +546,7 @@ export default function ProductList({
                       {(user?.role === "admin" || user?.role === "seller") && (
                         <div className="flex gap-2">
                           <Link
-                            href={`/products/${product.id}/edit`}
+                            href={`/dashboard/products/${product.id}/edit`}
                             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit Product"
                           >
