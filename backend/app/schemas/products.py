@@ -52,6 +52,7 @@ class ProductOut(ProductBase):
 class ProductSimpleOut(BaseModel):
     id: int
     name: str
+    description:str
     price: Decimal
     slug: Optional[str]
     status: str

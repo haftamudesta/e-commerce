@@ -68,6 +68,7 @@ export const productsAPI = {
     if (search) url += `&search=${encodeURIComponent(search)}`;
     
     const response = await api.get(url);
+    console.log("response:",response.data)
     return response.data;
   },
 
