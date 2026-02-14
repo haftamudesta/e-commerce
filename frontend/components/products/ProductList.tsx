@@ -60,6 +60,7 @@ export default function ProductList({
     maxPrice: "",
     search: "",
   });
+  console.log("Products:", products);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(

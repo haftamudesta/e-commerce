@@ -49,7 +49,6 @@ export default function LoginPage() {
       setApiError("");
       await login(data.username, data.password);
       router.push("/");
-      router.refresh();
     } catch (err: any) {
       let errorMessage = "Sign in failed. Please check your credentials.";
 
