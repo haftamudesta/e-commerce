@@ -45,7 +45,10 @@ async def get_products(
     """
     Get all products with pagination and filtering
     """
-    query = select(Product).options(selectinload(Product.images))
+    query = select(Product).options(
+        selectinload(Product.category),
+        selectinload(Product.images)
+    )
     
     if category_id:
         query = query.where(Product.category_id == category_id)
@@ -83,6 +86,7 @@ async def get_products(
 
     product_list = []
     for product in products:
+        category_name = product.category.name if product.category else None
         product_out = ProductOut(
             id=product.id,
             name=product.name,
@@ -92,6 +96,7 @@ async def get_products(
             slug=product.slug,
             status=product.status,
             category_id=product.category_id,
+            category_name=category_name,
             created_at=product.created_at,
             updated_at=product.updated_at
         )
