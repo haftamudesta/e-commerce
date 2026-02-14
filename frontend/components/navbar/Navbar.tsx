@@ -32,7 +32,6 @@ export default function Navbar() {
 
   return (
     <nav
-      className="border-b"
       style={{
         background: "linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%)",
       }}
@@ -48,14 +47,14 @@ export default function Navbar() {
             <Link href="/">Home</Link>
 
             {user?.role === "admin" && (
-              <Link href="/admin/users">
+              <Link href="/dashboard">
                 <Button
                   variant={pathname === "/admin/users" ? "default" : "ghost"}
                   size="sm"
                   className="flex items-center gap-2"
                 >
                   <Settings className="h-4 w-4" />
-                  Admin
+                  Dashboard
                 </Button>
               </Link>
             )}

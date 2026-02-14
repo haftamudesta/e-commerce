@@ -124,7 +124,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   const price = parseFloat(currentProduct.price.toString());
   const isOutOfStock =
-    currentProduct.quantity === 0 || currentProduct.status === "out_of_stock";
+    currentProduct.quantity === 0 || currentProduct.status === "archived";
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -220,9 +220,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded ${
-                        currentProduct.status === "published"
+                        currentProduct.status === "active"
                           ? "bg-green-100 text-green-800"
-                          : currentProduct.status === "out_of_stock"
+                          : currentProduct.status === "archived"
                             ? "bg-red-100 text-red-800"
                             : "bg-yellow-100 text-yellow-800"
                       }`}
