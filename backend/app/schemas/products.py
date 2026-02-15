@@ -46,6 +46,8 @@ class ProductOut(ProductBase):
     
     
     category_name: Optional[str] = None
+    images: List[ProductImageSchema] = [] 
+    primary_image: Optional[ProductImageSchema] = None
     
     model_config = ConfigDict(from_attributes=True)
 

@@ -45,10 +45,20 @@ async def get_products(
     """
     Get all products with pagination and filtering
     """
-    print("\n" + "="*50)
-    print("📦 GET PRODUCTS REQUEST")
-    print("="*50)
+
+    print("\n" + "="*70)
+    print("📦 GET PRODUCTS REQUEST - DEBUG MODE")
+    print("="*70)
     print(f"📦 Params: skip={skip}, limit={limit}, category_id={category_id}, status={status}")
+    
+    all_images = await db.execute(select(ProductImage))
+    all_images_list = all_images.scalars().all()
+    print(f"\n📸 TOTAL IMAGES IN DATABASE: {len(all_images_list)}")
+    for img in all_images_list:
+        print(f"   - Image ID: {img.id}, Product ID: {img.product_id}, URL: {img.image_url}")
+    
+
+
     query = select(Product).options(
         selectinload(Product.category),
         selectinload(Product.images)
@@ -90,6 +100,9 @@ async def get_products(
 
     product_list = []
     for product in products:
+        print(f"\n🆔 Product ID: {product.id} - {product.name}")
+        print(f"   Category: {product.category.name if product.category else 'None'}")
+        print(f"   Images loaded via selectinload: {len(product.images)}")
         category_name = product.category.name if product.category else None
         images = [
             ProductImageSchema(
