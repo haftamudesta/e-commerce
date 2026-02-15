@@ -99,7 +99,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           </button>
         </div>
         <Link
-          href="/products"
+          href="/dashboard/products"
           className="text-blue-600 hover:text-blue-800 mt-4 inline-block"
         >
           Go back to products
@@ -113,7 +113,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="text-center py-12">
         <p className="text-gray-500 text-lg">Product not found</p>
         <Link
-          href="/products"
+          href="/dashboard/products"
           className="text-blue-600 hover:text-blue-800 mt-4 inline-block"
         >
           Go back to products
@@ -130,7 +130,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
         <Link
-          href="/products"
+          href="/dashboard/products"
           className="inline-flex items-center text-blue-600 hover:text-blue-800"
         >
           <ArrowLeft size={20} className="mr-2" />
@@ -157,7 +157,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           <div className="space-y-4">
             <div className="bg-white rounded-lg shadow p-4">
               <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                {/* Placeholder image */}
                 <div className="text-gray-400">
                   <svg
                     className="w-32 h-32"

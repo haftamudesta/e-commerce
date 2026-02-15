@@ -45,6 +45,10 @@ async def get_products(
     """
     Get all products with pagination and filtering
     """
+    print("\n" + "="*50)
+    print("📦 GET PRODUCTS REQUEST")
+    print("="*50)
+    print(f"📦 Params: skip={skip}, limit={limit}, category_id={category_id}, status={status}")
     query = select(Product).options(
         selectinload(Product.category),
         selectinload(Product.images)
@@ -87,6 +91,27 @@ async def get_products(
     product_list = []
     for product in products:
         category_name = product.category.name if product.category else None
+        images = [
+            ProductImageSchema(
+                id=img.id,
+                image_url=img.image_url,
+                thumbnail_url=img.thumbnail_url,
+                alt_text=img.alt_text,
+                is_primary=img.is_primary,
+                display_order=img.display_order
+            )
+            for img in product.images
+        ]
+        primary_image = None
+        if product.primary_image:
+            primary_image = ProductImageSchema(
+                id=product.primary_image.id,
+                image_url=product.primary_image.image_url,
+                thumbnail_url=product.primary_image.thumbnail_url,
+                alt_text=product.primary_image.alt_text,
+                is_primary=product.primary_image.is_primary,
+                display_order=product.primary_image.display_order
+            )
         product_out = ProductOut(
             id=product.id,
             name=product.name,
@@ -97,6 +122,8 @@ async def get_products(
             status=product.status,
             category_id=product.category_id,
             category_name=category_name,
+            images=images,
+            primary_image=primary_image,
             created_at=product.created_at,
             updated_at=product.updated_at
         )
@@ -166,6 +193,7 @@ async def create_product(
     """
     Create a new product (Admin/Seller only)
     """
+    
     if product.category_id:
         result = await db.execute(
             select(Category).where(Category.id == product.category_id)

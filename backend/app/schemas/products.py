@@ -58,6 +58,7 @@ class ProductSimpleOut(BaseModel):
     status: str
     quantity: int
     category_name: Optional[str]
+    images: List[ProductImageSchema] = []
     
     model_config = ConfigDict(from_attributes=True)
 

@@ -103,6 +103,7 @@ export default function ProductForm({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [slugGenerated, setSlugGenerated] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
 
   const {
     register,
@@ -141,6 +142,8 @@ export default function ProductForm({
 
   useEffect(() => {
     if (isEdit && currentProduct) {
+      console.log("Current product images:", currentProduct.images);
+
       reset({
         name: currentProduct.name || "",
         description: currentProduct.description || "",
@@ -152,7 +155,7 @@ export default function ProductForm({
         category_id: currentProduct.category_id?.toString() || "",
       });
 
-      if (currentProduct.images) {
+      if (currentProduct.images && currentProduct.images.length > 0) {
         setImages(
           currentProduct.images
             .sort((a, b) => a.display_order - b.display_order)
@@ -165,6 +168,8 @@ export default function ProductForm({
               display_order: img.display_order,
             })),
         );
+      } else {
+        setImages([]);
       }
     }
   }, [isEdit, currentProduct, reset]);
@@ -190,6 +195,11 @@ export default function ProductForm({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
+    console.log(
+      "Selected files:",
+      files.map((f) => ({ name: f.name, size: f.size, type: f.type })),
+    );
+
     const newImages: ProductImage[] = files.map((file, index) => ({
       image_url: URL.createObjectURL(file),
       is_primary: images.length === 0 && index === 0,
@@ -201,6 +211,7 @@ export default function ProductForm({
     }));
 
     setImages((prev) => [...prev, ...newImages]);
+    console.log("New images added:", newImages.length);
 
     e.target.value = "";
   };
@@ -223,6 +234,10 @@ export default function ProductForm({
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+      console.log(
+        "Dropped image files:",
+        imageFiles.map((f) => f.name),
+      );
 
       const newImages: ProductImage[] = imageFiles.map((file, index) => ({
         image_url: URL.createObjectURL(file),
@@ -250,6 +265,7 @@ export default function ProductForm({
 
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
+
   const moveImage = (index: number, direction: "up" | "down") => {
     if (
       (direction === "up" && index === 0) ||
@@ -286,70 +302,88 @@ export default function ProductForm({
 
   const uploadImagesForProduct = async (productId: number) => {
     const imagesToUpload = images.filter((img) => img.file && !img.id);
+    console.log("Images to upload:", imagesToUpload.length);
 
-    if (imagesToUpload.length === 0) return;
-
-    const batchSize = 3;
-    for (let i = 0; i < imagesToUpload.length; i += batchSize) {
-      const batch = imagesToUpload.slice(i, i + batchSize);
-
-      await Promise.all(
-        batch.map(async (image, batchIndex) => {
-          const imageIndex = images.findIndex((img) => img.file === image.file);
-          setImages((prev) => {
-            const updated = [...prev];
-            updated[imageIndex] = {
-              ...updated[imageIndex],
-              isUploading: true,
-              uploadProgress: 0,
-            };
-            return updated;
-          });
-
-          try {
-            const uploadedImage = await uploadProductImage(
-              productId,
-              image.file!,
-              {
-                is_primary: image.is_primary,
-                display_order: image.display_order,
-                alt_text: image.alt_text || watchName,
-              },
-            );
-
-            setImages((prev) => {
-              const updated = [...prev];
-              updated[imageIndex] = {
-                ...uploadedImage,
-                isUploading: false,
-                uploadProgress: 100,
-              };
-              return updated;
-            });
-          } catch (error) {
-            setImages((prev) => {
-              const updated = [...prev];
-              updated[imageIndex] = {
-                ...updated[imageIndex],
-                isUploading: false,
-                error: "Failed to upload image",
-              };
-              return updated;
-            });
-            throw error;
-          }
-        }),
-      );
+    if (imagesToUpload.length === 0) {
+      console.log("No images to upload");
+      return;
     }
+
+    setUploadStatus(`Uploading ${imagesToUpload.length} images...`);
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imagesToUpload.length; i++) {
+      const image = imagesToUpload[i];
+      const imageIndex = images.findIndex((img) => img.file === image.file);
+
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[imageIndex] = {
+          ...updated[imageIndex],
+          isUploading: true,
+          uploadProgress: 0,
+        };
+        return updated;
+      });
+
+      try {
+        console.log(
+          `Uploading image ${i + 1}/${imagesToUpload.length}: ${image.file?.name}`,
+        );
+        setUploadStatus(`Uploading ${image.file?.name}...`);
+
+        const uploadedImage = await uploadProductImage(productId, image.file!, {
+          is_primary: image.is_primary,
+          display_order: image.display_order,
+          alt_text: image.alt_text || watchName,
+        });
+
+        console.log("Upload successful:", uploadedImage);
+        uploadedImages.push(uploadedImage);
+
+        setImages((prev) => {
+          const updated = [...prev];
+          updated[imageIndex] = {
+            ...uploadedImage,
+            isUploading: false,
+            uploadProgress: 100,
+          };
+          return updated;
+        });
+
+        setUploadStatus(`Uploaded ${image.file?.name}`);
+      } catch (error: any) {
+        console.error(`Failed to upload image ${image.file?.name}:`, error);
+        setImages((prev) => {
+          const updated = [...prev];
+          updated[imageIndex] = {
+            ...updated[imageIndex],
+            isUploading: false,
+            error: `Failed to upload: ${error.message || "Unknown error"}`,
+          };
+          return updated;
+        });
+        throw error;
+      }
+    }
+
+    setUploadStatus(`Successfully uploaded ${uploadedImages.length} images!`);
+    setTimeout(() => setUploadStatus(""), 3000);
+
+    return uploadedImages;
   };
 
   const deleteMarkedImages = async () => {
     if (deletedImageIds.length === 0) return;
 
+    console.log("Deleting images:", deletedImageIds);
+
     await Promise.all(
       deletedImageIds.map(async (imageId) => {
         try {
           await deleteProductImage(imageId);
+          console.log(`Deleted image ${imageId}`);
         } catch (error) {
           console.error(`Failed to delete image ${imageId}:`, error);
         }
@@ -361,6 +395,7 @@ export default function ProductForm({
     if (!isEdit || !currentProduct) return;
 
     const updatedImages = images.filter((img) => img.id);
+    console.log("Updating image metadata for:", updatedImages.length, "images");
 
     await Promise.all(
       updatedImages.map(async (image) => {
@@ -375,6 +410,12 @@ export default function ProductForm({
             originalImage.display_order !== image.display_order)
         ) {
           try {
+            console.log(`Updating image ${image.id}:`, {
+              alt_text: image.alt_text,
+              is_primary: image.is_primary,
+              display_order: image.display_order,
+            });
+
             await updateProductImage(image.id!, {
               alt_text: image.alt_text || undefined,
               is_primary: image.is_primary,
@@ -399,6 +440,7 @@ export default function ProductForm({
           display_order: index,
         }));
 
+      console.log("Reordering images:", imageOrder);
       await reorderProductImages(currentProduct.id, imageOrder);
     }
   };
@@ -407,6 +449,7 @@ export default function ProductForm({
     setIsSubmitting(true);
     setFormError(null);
     setSuccessMessage(null);
+    setUploadStatus("");
 
     try {
       const productData = {
@@ -417,11 +460,15 @@ export default function ProductForm({
         slug: data.slug || undefined,
       };
 
+      console.log("Submitting product data:", productData);
+      console.log("Images to process:", images.length);
+
       let newProductId: number;
 
       if (isEdit) {
         if (!currentProduct?.id) throw new Error("Product ID not found");
 
+        console.log("Updating product:", currentProduct.id);
         await updateProduct(currentProduct.id, productData);
         newProductId = currentProduct.id;
 
@@ -430,10 +477,18 @@ export default function ProductForm({
 
         setSuccessMessage("Product updated successfully!");
       } else {
+        console.log("Creating new product");
         const newProduct = await createProduct(productData);
+        console.log("Product created with ID:", newProduct.id);
         newProductId = newProduct.id;
 
-        await uploadImagesForProduct(newProductId);
+        if (images.length > 0) {
+          console.log("Uploading images for new product");
+          const uploadedImages = await uploadImagesForProduct(newProductId);
+          console.log("Uploaded images:", uploadedImages);
+        } else {
+          console.log("No images to upload for new product");
+        }
 
         setSuccessMessage("Product created successfully!");
       }
@@ -441,13 +496,13 @@ export default function ProductForm({
       if (isEdit) {
         await refreshCurrentProduct();
       }
-
-      setTimeout(() => {
+      setTimeout(async () => {
+        await fetchProduct(newProductId);
         onSuccess?.();
         if (!onSuccess) {
-          router.push(`/products/${newProductId}`);
+          router.push(`/dashboard/products/${newProductId}`);
         }
-      }, 1500);
+      }, 2000);
     } catch (error: any) {
       console.error("Error in form submission:", error);
       setFormError(
@@ -495,6 +550,12 @@ export default function ProductForm({
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {uploadStatus && (
+        <div className="rounded-md bg-blue-50 p-4">
+          <p className="text-sm font-medium text-blue-800">{uploadStatus}</p>
         </div>
       )}
 
@@ -684,9 +745,9 @@ export default function ProductForm({
               <p className="mt-2 text-xs text-gray-500">
                 Draft: Only visible to you
                 <br />
-                active: Visible to customers
+                Active: Visible to customers
                 <br />
-                archived: Listed but not purchasable
+                Archived: Listed but not purchasable
               </p>
             </div>
           </div>

@@ -18,10 +18,11 @@ import {
   Image as ImageIcon,
   AlertCircle,
   Loader2,
+  Archive,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 interface ProductListProps {
   categoryId?: number;
@@ -36,7 +37,6 @@ export default function ProductList({
   limit: initialLimit = 12,
   initialPage = 1,
 }: ProductListProps) {
-  const router = useRouter();
   const {
     products,
     loading,
@@ -60,13 +60,18 @@ export default function ProductList({
     maxPrice: "",
     search: "",
   });
-  console.log("Products:", products);
+
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categoryId?.toString() || "",
   );
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+
+  // API base URL - from environment or default
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   useEffect(() => {
     fetchProducts({
@@ -159,7 +164,26 @@ export default function ProductList({
   };
 
   const handleImageError = (productId: number) => {
+    console.log(`Image failed to load for product ${productId}`);
     setImageErrors((prev) => ({ ...prev, [productId]: true }));
+  };
+
+  const handleImageLoad = (productId: number) => {
+    console.log(`Image loaded successfully for product ${productId}`);
+    setLoadedImages((prev) => ({ ...prev, [productId]: true }));
+  };
+
+  const getFullImageUrl = (imageUrl: string | undefined) => {
+    if (!imageUrl) return null;
+
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+      return imageUrl;
+    }
+
+    // Ensure the URL starts with a slash
+    const cleanUrl = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
+    return `${API_BASE_URL}${cleanUrl}`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -169,28 +193,41 @@ export default function ProductList({
   };
 
   const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "published":
+    switch (status?.toLowerCase()) {
+      case "active":
         return "bg-green-100 text-green-800 border-green-200";
-      case "out_of_stock":
-        return "bg-red-100 text-red-800 border-red-200";
       case "draft":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "archived":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return <CheckCircle className="w-3 h-3 mr-1" />;
+      case "draft":
+        return <Clock className="w-3 h-3 mr-1" />;
+      case "archived":
+        return <Archive className="w-3 h-3 mr-1" />;
+      default:
+        return null;
+    }
+  };
+
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "published":
-        return "Published";
-      case "out_of_stock":
-        return "Out of Stock";
+    switch (status?.toLowerCase()) {
+      case "active":
+        return "Active";
       case "draft":
         return "Draft";
+      case "archived":
+        return "Archived";
       default:
-        return status;
+        return status || "Unknown";
     }
   };
 
@@ -204,6 +241,9 @@ export default function ProductList({
 
   const totalPages = Math.ceil(total / limit);
   const canAddProduct = user?.role === "admin" || user?.role === "seller";
+
+  // Log products for debugging
+  console.log("Products received:", products);
 
   if (loading && products.length === 0) {
     return (
@@ -348,8 +388,8 @@ export default function ProductList({
               >
                 <option value="">All Status</option>
                 <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="out_of_stock">Out of Stock</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
               </select>
             </div>
 
@@ -441,8 +481,24 @@ export default function ProductList({
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => {
-              const primaryImage = product.primary_image || product.images?.[0];
-              const hasImage = !!primaryImage && !imageErrors[product.id];
+              // Safely access images - ensure images is always an array
+              const images = product.images || [];
+              const primaryImage =
+                product.primary_image ||
+                images.find((img) => img?.is_primary) ||
+                images[0];
+              const hasImage =
+                primaryImage?.image_url && !imageErrors[product.id];
+              const fullImageUrl = getFullImageUrl(primaryImage?.image_url);
+
+              // Log image URL for debugging
+              if (primaryImage?.image_url) {
+                console.log(`Product ${product.id} image URL:`, {
+                  original: primaryImage.image_url,
+                  full: fullImageUrl,
+                  hasImage,
+                });
+              }
 
               return (
                 <div
@@ -454,15 +510,17 @@ export default function ProductList({
                     className="block relative"
                   >
                     <div className="relative h-56 bg-gray-100 overflow-hidden">
-                      {hasImage ? (
+                      {hasImage && fullImageUrl ? (
                         <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={primaryImage.image_url}
-                            alt={primaryImage.alt_text || product.name}
+                            src={fullImageUrl}
+                            alt={primaryImage?.alt_text || product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             onError={() => handleImageError(product.id)}
+                            onLoad={() => handleImageLoad(product.id)}
                           />
-                          {primaryImage.is_primary && (
+                          {primaryImage?.is_primary && (
                             <div className="absolute top-3 left-3">
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-400 text-yellow-900 shadow-sm">
                                 <Star className="w-3 h-3 mr-1 fill-current" />
@@ -483,6 +541,7 @@ export default function ProductList({
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(product.status)}`}
                         >
+                          {getStatusIcon(product.status)}
                           {getStatusLabel(product.status)}
                         </span>
                       </div>
@@ -504,25 +563,24 @@ export default function ProductList({
                     </div>
                   </Link>
                   <div className="p-5">
-                    {product.category && (
+                    {product.category?.name && (
                       <div className="mb-2">
                         <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                          {product.category.name}
+                          {product.category?.name}
                         </span>
                       </div>
                     )}
+
                     <Link href={`/dashboard/products/${product.id}`}>
                       <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 transition-colors line-clamp-2">
                         {product.name}
                       </h3>
                     </Link>
 
-                    {/* Description */}
                     <p className="text-gray-500 text-sm mb-3 line-clamp-2">
                       {product.description || "No description available"}
                     </p>
 
-                    {/* Price */}
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-2xl font-bold text-gray-900">
                         {formatPrice(product.price)}
@@ -534,7 +592,6 @@ export default function ProductList({
                       )}
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <Link
                         href={`/dashboard/products/${product.id}`}
@@ -574,7 +631,6 @@ export default function ProductList({
             })}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8">
               <div className="flex items-center gap-2">
@@ -622,7 +678,7 @@ export default function ProductList({
                       <button
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}
-                        className={`min-w-[40px] h-10 px-2 rounded-lg border ${
+                        className={`min-w-10 h-10 px-2 rounded-lg border ${
                           page === pageNum
                             ? "bg-blue-600 text-white border-blue-600"
                             : "border-gray-300 text-gray-700 hover:bg-gray-50"
