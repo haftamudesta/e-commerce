@@ -1,10 +1,11 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ProductList from "@/components/products/ProductList";
 
 export default function Home() {
   return (
     <ProtectedRoute>
       <main>
-        <h1>Ecommerce App</h1>
+        <ProductList />
       </main>
     </ProtectedRoute>
   );
