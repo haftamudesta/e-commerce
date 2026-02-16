@@ -11,6 +11,19 @@ export interface ProductImage {
   created_at: string;
   updated_at: string;
 }
+export interface Review {
+  id: number;
+  text: string;
+  rating: number;
+  user_id: number;
+  product_id: number;
+  created_at: string;
+  updated_at?: string;
+  username?: string;
+  user_avatar?: string;
+}
+
+
 export interface Product {
   id: number;
   name: string;
@@ -26,6 +39,9 @@ export interface Product {
   };
   images?: ProductImage[]; 
   primary_image?: ProductImage | null;
+  reviews?: Review[];
+  average_rating?: number;
+  review_count?: number;
 }
 
 export interface ProductsResponse {
@@ -189,7 +205,20 @@ export const productsAPI = {
     return response.data;
   },
    getProductWithImages: async (id: number): Promise<Product> => {
-    const response = await api.get(`/api/v1/products/${id}?include_images=true`);
+  const response = await api.get(`/api/v1/products/${id}?include_images=true`);
+  console.log("🔍 Product with images response:", response.data);
+  return response.data;
+},
+  getProductWithReviews: async (id: number): Promise<Product> => {
+    const response = await api.get(`/api/v1/products/${id}?include_reviews=true`);
     return response.data;
   },
+  getProductStats: async (id: number): Promise<{
+    average_rating: number;
+    review_count: number;
+    rating_counts: { [key: number]: number };
+  }> => {
+    const response = await api.get(`/api/v1/products/${id}/stats`);
+    return response.data;
+  }
 };
