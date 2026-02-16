@@ -271,7 +271,7 @@ export default function ProductReviews({
         </div>
       )}
       {stats && stats.total_reviews > 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <div className="bg-linear-to-br from-blue-50 to-cyan-100 rounded-xl shadow-sm p-6 border border-gray-100">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center md:border-r border-gray-200">
               <div className="text-5xl font-bold text-gray-900">
@@ -387,7 +387,7 @@ export default function ProductReviews({
             return (
               <div
                 key={review.id}
-                className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                className="bg-linear-to-br from-amber-50 to-orange-100 rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow "
               >
                 {editingId === review.id ? (
                   <div className="space-y-4">
@@ -431,7 +431,7 @@ export default function ProductReviews({
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-4 ">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center shrink-0">
                           <User className="w-6 h-6 text-white" />
