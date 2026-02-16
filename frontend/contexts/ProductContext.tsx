@@ -88,6 +88,8 @@ interface ProductsContextType {
   clearCurrentProduct: () => void;
   clearError: () => void;
   refreshCurrentProduct: () => Promise<void>;
+  fetchProductWithReviews?: (id: number) => Promise<void>;
+  getProductStats?: (id: number) => Promise<any>;
 }
 
 const ProductsContext = createContext<ProductsContextType | undefined>(
@@ -697,6 +699,32 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
       fetchProducts();
     }
   }, [token, fetchProducts]);
+  const fetchProductWithReviews = useCallback(async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const product = await productsAPI.getProductWithReviews(id);
+      setCurrentProduct(product);
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.message ||
+        "Failed to fetch product with reviews";
+      setError(errorMsg);
+      console.error("Error fetching product with reviews:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  const getProductStats = useCallback(async (id: number) => {
+    try {
+      const stats = await productsAPI.getProductStats(id);
+      return stats;
+    } catch (err: any) {
+      console.error("Error fetching product stats:", err);
+      return null;
+    }
+  }, []);
 
   const value = {
     products,
@@ -729,6 +757,8 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
     clearCurrentProduct,
     clearError,
     refreshCurrentProduct,
+    fetchProductWithReviews,
+    getProductStats,
   };
 
   return (
