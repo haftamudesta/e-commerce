@@ -154,6 +154,7 @@ async def get_products(
 @router.get("/{product_id}", response_model=ProductWithCategory)
 async def get_product(
     product_id: int,
+    include_images: bool = Query(False, description="Include images in response"),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -187,6 +188,29 @@ async def get_product(
         "created_at": product.created_at,
         "updated_at": product.updated_at,
     }
+
+    if include_images and product.images:
+        from app.schemas.products import ProductImageSchema
+        product_data["images"] = [
+            ProductImageSchema(
+                id=img.id,
+                image_url=img.image_url,
+                thumbnail_url=img.thumbnail_url,
+                alt_text=img.alt_text,
+                is_primary=img.is_primary,
+                display_order=img.display_order
+            )
+            for img in product.images
+        ]
+    if product.primary_image:
+            product_data["primary_image"] = ProductImageSchema(
+                id=product.primary_image.id,
+                image_url=product.primary_image.image_url,
+                thumbnail_url=product.primary_image.thumbnail_url,
+                alt_text=product.primary_image.alt_text,
+                is_primary=product.primary_image.is_primary,
+                display_order=product.primary_image.display_order
+            )
     
     if product.category:
         from app.schemas.categories import CategoryOut
