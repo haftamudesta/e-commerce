@@ -5,6 +5,7 @@ import { AuthProvider } from "../contexts/AuthContext";
 import Navbar from "../components/navbar/Navbar";
 import { CategoriesProvider } from "../contexts/CategoryContext";
 import { ProductsProvider } from "../contexts/ProductContext";
+import { ReviewsProvider } from "@/contexts/ReviewContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,10 @@ export default function RootLayout({
         <AuthProvider>
           <CategoriesProvider>
             <ProductsProvider>
-              <Navbar />
-              <main className="container mx-auto px-4 py-8">{children}</main>
+              <ReviewsProvider>
+                <Navbar />
+                <main className="container mx-auto px-4 py-8">{children}</main>
+              </ReviewsProvider>
             </ProductsProvider>
           </CategoriesProvider>
         </AuthProvider>
