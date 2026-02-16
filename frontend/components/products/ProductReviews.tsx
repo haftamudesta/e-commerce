@@ -47,6 +47,8 @@ export default function ProductReviews({
     hasUserReviewed,
     clearError,
   } = useReviews();
+  console.log(reviews);
+  console.log("user", user);
 
   const [newReview, setNewReview] = useState({ text: "", rating: 5 });
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -208,7 +210,7 @@ export default function ProductReviews({
     const percentage = total > 0 ? (count / total) * 100 : 0;
 
     return (
-      <div className="flex items-center gap-2 text-sm">
+      <div key={`rating-${rating}`} className="flex items-center gap-2 text-sm">
         <span className="w-12 text-gray-600">{rating} stars</span>
         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
@@ -436,7 +438,7 @@ export default function ProductReviews({
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
-                            {review.username || `User ${review.user_id}`}
+                            {user?.username || `User ${review.user_id}`}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             {renderStars(review.rating)}

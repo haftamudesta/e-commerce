@@ -166,28 +166,17 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
     try {
       console.log(`🔍 Fetching product ${id} with images...`);
+      // Use the correct method that includes images
       const product = await productsAPI.getProductWithImages(id);
       console.log("✅ Product data received:", product);
       console.log("📸 Images in product:", product.images);
-      console.log("🎯 Primary image:", product.primary_image);
-      if (product.images && product.images.length > 0) {
-        console.log(`📸 Found ${product.images.length} images:`);
-        product.images.forEach((img, index) => {
-          console.log(`   Image ${index + 1}:`, {
-            id: img.id,
-            url: img.image_url,
-            is_primary: img.is_primary,
-          });
-        });
-      } else {
-        console.log("⚠️ No images found in product data");
-      }
+
       setCurrentProduct(product);
     } catch (err: any) {
       const errorMsg =
         err.response?.data?.detail || err.message || "Failed to fetch product";
       setError(errorMsg);
-      console.error("Error fetching product:", err);
+      console.error("❌ Error fetching product:", err);
     } finally {
       setLoading(false);
     }

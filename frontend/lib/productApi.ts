@@ -205,9 +205,10 @@ export const productsAPI = {
     return response.data;
   },
    getProductWithImages: async (id: number): Promise<Product> => {
-    const response = await api.get(`/api/v1/products/${id}?include_images=true`);
-    return response.data;
-  },
+  const response = await api.get(`/api/v1/products/${id}?include_images=true`);
+  console.log("🔍 Product with images response:", response.data);
+  return response.data;
+},
   getProductWithReviews: async (id: number): Promise<Product> => {
     const response = await api.get(`/api/v1/products/${id}?include_reviews=true`);
     return response.data;
