@@ -19,6 +19,7 @@ import { LogOut, User, ShoppingBag, Settings, Heart } from "lucide-react";
 import CartIcon from "@/components/icons/CartIcon";
 import FavoriteIcon from "@/components/icons/FavoriteIcon";
 import useStore from "@/store";
+import ThemeToggler from "../theme/ThemeToggler";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -70,7 +71,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <FavoriteIcon />
           <CartIcon />
-
+          <ThemeToggler />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

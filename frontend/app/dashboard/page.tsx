@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { ShoppingCart, Star } from "lucide-react";
 

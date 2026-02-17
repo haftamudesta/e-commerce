@@ -6,7 +6,6 @@ import { createCartSlice } from './slices/cartSlice';
 import { createFavoriteSlice } from './slices/favoriteSlice';
 import { createUISlice } from './slices/uiSlice';
 
-// Combine all slices into one store
 const useStore = create<StoreState>()(
   devtools(
     persist(
@@ -21,6 +20,8 @@ const useStore = create<StoreState>()(
         partialize: (state) => ({
           cart: state.cart,
           favoriteProduct: state.favoriteProduct,
+          theme: state.theme,
+          isDarkMode: state.isDarkMode,
         }),
       }
     ),
@@ -30,47 +31,44 @@ const useStore = create<StoreState>()(
 
 export default useStore;
 
-export const useCart = () => useStore((state) => ({
-  cart: state.cart,
-  isCartOpen: state.isCartOpen,
-  addToCart: state.addToCart,
-  removeFromCart: state.removeFromCart,
-  updateCartQuantity: state.updateCartQuantity,
-  clearCart: state.clearCart,
-  getCartTotal: state.getCartTotal,
-  getCartCount: state.getCartCount,
-  toggleCart: state.toggleCart,
-  openCart: state.openCart,
-  closeCart: state.closeCart,
-}));
 
-export const useFavorites = () => useStore((state) => ({
-  favoriteProduct: state.favoriteProduct,
-  addToFavorite: state.addToFavorite,
-  removeFromFavorite: state.removeFromFavorite,
-  isFavorite: state.isFavorite,
-  clearFavorites: state.clearFavorites,
-  getFavoriteCount: state.getFavoriteCount,
-}));
+// UI Selectors
+export const useIsDarkMode = () => useStore((state) => state.isDarkMode);
+export const useTheme = () => useStore((state) => state.theme);
+export const useMobileMenuOpen = () => useStore((state) => state.isMobileMenuOpen);
+export const useSearchQuery = () => useStore((state) => state.searchQuery);
 
-export const useUI = () => useStore((state) => ({
-  isDarkMode: state.isDarkMode,
-  isMobileMenuOpen: state.isMobileMenuOpen,
-  searchQuery: state.searchQuery,
-  toggleDarkMode: state.toggleDarkMode,
-  toggleMobileMenu: state.toggleMobileMenu,
-  openMobileMenu: state.openMobileMenu,
-  closeMobileMenu: state.closeMobileMenu,
-  setSearchQuery: state.setSearchQuery,
-  clearSearchQuery: state.clearSearchQuery,
-}));
+// UI Action Selectors
+export const useToggleDarkMode = () => useStore((state) => state.toggleDarkMode);
+export const useSetTheme = () => useStore((state) => state.setTheme);
+export const useToggleMobileMenu = () => useStore((state) => state.toggleMobileMenu);
+export const useOpenMobileMenu = () => useStore((state) => state.openMobileMenu);
+export const useCloseMobileMenu = () => useStore((state) => state.closeMobileMenu);
+export const useSetSearchQuery = () => useStore((state) => state.setSearchQuery);
+export const useClearSearchQuery = () => useStore((state) => state.clearSearchQuery);
 
+// Cart Selectors
+export const useCartCount = () => useStore((state) => state.getCartCount());
+export const useCartTotal = () => useStore((state) => state.getCartTotal());
 export const useCartItems = () => useStore((state) => state.cart);
 export const useCartOpen = () => useStore((state) => state.isCartOpen);
+
+// Cart Action Selectors
+export const useAddToCart = () => useStore((state) => state.addToCart);
+export const useRemoveFromCart = () => useStore((state) => state.removeFromCart);
+export const useUpdateCartQuantity = () => useStore((state) => state.updateCartQuantity);
+export const useClearCart = () => useStore((state) => state.clearCart);
+export const useToggleCart = () => useStore((state) => state.toggleCart);
+export const useOpenCart = () => useStore((state) => state.openCart);
+export const useCloseCart = () => useStore((state) => state.closeCart);
+
+// Favorite Selectors
+export const useFavoritesCount = () => useStore((state) => state.getFavoriteCount());
 export const useFavoritesItems = () => useStore((state) => state.favoriteProduct);
 export const useIsFavorite = (productId: number) => 
   useStore((state) => state.isFavorite(productId));
 
-export const useCartCount = () => useStore((state) => state.getCartCount());
-export const useCartTotal = () => useStore((state) => state.getCartTotal());
-
+// Favorite Action Selectors
+export const useAddToFavorite = () => useStore((state) => state.addToFavorite);
+export const useRemoveFromFavorite = () => useStore((state) => state.removeFromFavorite);
+export const useClearFavorites = () => useStore((state) => state.clearFavorites);
