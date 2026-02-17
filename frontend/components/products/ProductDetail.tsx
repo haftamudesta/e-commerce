@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useReviews } from "@/contexts/ReviewContext";
 import { useAuth } from "@/contexts/AuthContext";
+import useStore, { useIsFavorite } from "@/store";
 import {
   Edit,
   Trash2,
@@ -18,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import ProductForm from "./ProductForm";
@@ -41,6 +43,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const { stats, fetchStats } = useReviews();
   const { user } = useAuth();
 
+  const { addToCart, addToFavorite, removeFromFavorite } = useStore();
+  const isFavorite = useIsFavorite(productId);
+
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -48,6 +53,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [favoriteAnimating, setFavoriteAnimating] = useState(false);
 
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -61,15 +68,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       clearCurrentProduct();
     };
   }, [productId, fetchProduct, fetchStats, clearCurrentProduct]);
-
-  // Log product data for debugging
-  useEffect(() => {
-    if (currentProduct) {
-      console.log("Current product:", currentProduct);
-      console.log("Product images:", currentProduct.images);
-      console.log("Primary image:", currentProduct.primary_image);
-    }
-  }, [currentProduct]);
 
   const handleDelete = async () => {
     if (
@@ -90,7 +88,46 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   };
 
   const handleAddToCart = () => {
-    alert(`Added ${quantity} ${currentProduct?.name} to cart!`);
+    if (!currentProduct) return;
+
+    addToCart({
+      id: currentProduct.id,
+      name: currentProduct.name,
+      price: parseFloat(currentProduct.price.toString()),
+      image:
+        getFullImageUrl(currentProduct.primary_image?.image_url) || undefined,
+      slug: currentProduct.slug || undefined,
+    });
+    currentProduct.quantity = currentProduct.quantity - 1;
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleToggleFavorite = () => {
+    if (!currentProduct) return;
+
+    setFavoriteAnimating(true);
+
+    if (isFavorite) {
+      removeFromFavorite(productId);
+    } else {
+      addToFavorite({
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: parseFloat(currentProduct.price.toString()),
+        image:
+          getFullImageUrl(currentProduct.primary_image?.image_url) || undefined,
+        slug: currentProduct.slug || undefined,
+        category_name: currentProduct.category?.name || undefined,
+      });
+    }
+
+    setTimeout(() => setFavoriteAnimating(false), 300);
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    window.location.href = "/checkout";
   };
 
   const incrementQuantity = () => {
@@ -108,12 +145,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const getFullImageUrl = (imageUrl: string | undefined) => {
     if (!imageUrl) return null;
 
-    // If it's already a full URL, return as is
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
       return imageUrl;
     }
 
-    // Ensure the URL starts with a slash
     const cleanUrl = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
     return `${API_BASE_URL}${cleanUrl}`;
   };
@@ -191,7 +226,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const isOutOfStock =
     currentProduct.quantity === 0 || currentProduct.status === "archived";
 
-  // Safely access images - same pattern as ProductList
   const images = currentProduct.images || [];
   const primaryImage =
     currentProduct.primary_image ||
@@ -230,7 +264,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         </div>
       ) : (
         <>
-          {/* Tabs */}
           <div className="border-b border-gray-200 mb-6">
             <nav className="flex gap-4">
               <button
@@ -264,10 +297,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
           {activeTab === "details" ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Images */}
               <div className="space-y-4">
                 <div className="bg-white rounded-lg shadow p-4">
-                  {/* Main Image */}
                   <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                     {hasImages && fullImageUrl && !hasImageError ? (
                       <>
@@ -291,8 +322,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                             </span>
                           </div>
                         )}
-
-                        {/* Image Navigation */}
                         {images.length > 1 && (
                           <>
                             <button
@@ -312,7 +341,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                           </>
                         )}
 
-                        {/* Image Counter */}
                         {images.length > 1 && (
                           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                             {selectedImage + 1} / {images.length}
@@ -331,7 +359,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     )}
                   </div>
 
-                  {/* Thumbnail Grid */}
                   {images.length > 1 && (
                     <div className="grid grid-cols-5 gap-2 mt-4">
                       {images.map((image, index) => {
@@ -378,7 +405,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   )}
                 </div>
 
-                {/* Admin Actions */}
                 {(user?.role === "admin" || user?.role === "seller") && (
                   <div className="bg-white rounded-lg shadow p-4">
                     <h3 className="font-semibold text-gray-800 mb-3">
@@ -408,8 +434,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     </div>
                   </div>
                 )}
-
-                {/* Reviews Summary Card */}
                 {stats && stats.total_reviews > 0 && (
                   <div className="bg-white rounded-lg shadow p-4">
                     <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -448,8 +472,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                 )}
               </div>
-
-              {/* Right Column - Product Info */}
               <div className="space-y-6">
                 <div className="bg-white rounded-lg shadow p-6">
                   <div className="flex justify-between items-start mb-4">
@@ -466,9 +488,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                         >
                           {currentProduct.status.replace("_", " ")}
                         </span>
-                        {currentProduct.category_name && (
+                        {currentProduct.category?.name && (
                           <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
-                            {currentProduct.category_name}
+                            {currentProduct.category?.name}
                           </span>
                         )}
                       </div>
@@ -585,48 +607,64 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                         <div className="flex gap-3">
                           <button
                             onClick={handleAddToCart}
-                            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+                            disabled={addedToCart}
+                            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                              addedToCart
+                                ? "bg-green-600 text-white"
+                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                            }`}
                           >
                             <ShoppingCart size={20} />
-                            Add to Cart
+                            {addedToCart ? "Added!" : "Add to Cart"}
                           </button>
-                          <button className="px-6 py-3 border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg font-medium">
-                            Buy Now
+
+                          <button
+                            onClick={handleToggleFavorite}
+                            className={`px-4 py-3 rounded-lg border transition-all ${
+                              isFavorite
+                                ? "border-red-500 text-red-500 bg-red-50"
+                                : "border-gray-300 text-gray-700 hover:border-red-500 hover:text-red-500"
+                            } ${favoriteAnimating ? "scale-110" : ""}`}
+                            aria-label={
+                              isFavorite
+                                ? "Remove from wishlist"
+                                : "Add to wishlist"
+                            }
+                          >
+                            <Heart
+                              size={20}
+                              className={isFavorite ? "fill-red-500" : ""}
+                            />
                           </button>
                         </div>
+
+                        <button
+                          onClick={handleBuyNow}
+                          className="w-full px-6 py-3 border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg font-medium"
+                        >
+                          Buy Now
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-slate-900 rounded-lg shadow p-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Additional Information
                   </h2>
                   <div className="space-y-3">
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-gray-600">Product ID</span>
-                      <span className="font-medium">#{currentProduct.id}</span>
-                    </div>
                     <div className="flex justify-between py-2 border-b">
                       <span className="text-gray-600">Status</span>
                       <span className="font-medium capitalize">
                         {currentProduct.status}
                       </span>
                     </div>
-                    {currentProduct.slug && (
-                      <div className="flex justify-between py-2 border-b">
-                        <span className="text-gray-600">Slug</span>
-                        <span className="font-medium">
-                          {currentProduct.slug}
-                        </span>
-                      </div>
-                    )}
-                    {currentProduct.category_name && (
+                    {currentProduct.category?.name && (
                       <div className="flex justify-between py-2 border-b">
                         <span className="text-gray-600">Category</span>
                         <span className="font-medium">
-                          {currentProduct.category_name}
+                          {currentProduct.category?.name}
                         </span>
                       </div>
                     )}
