@@ -65,7 +65,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
   },
   
   clearCart: () => set({ cart: [] }),
-  
+ 
   getCartTotal: () => {
     const { cart } = get();
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -76,8 +76,12 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     return cart.reduce((count, item) => count + item.quantity, 0);
   },
   
+  
   toggleCart: () => set(state => ({ isCartOpen: !state.isCartOpen })),
   
+
   openCart: () => set({ isCartOpen: true }),
+  
+  
   closeCart: () => set({ isCartOpen: false }),
 });
