@@ -15,12 +15,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, User, ShoppingBag, Home, Settings } from "lucide-react";
+import { LogOut, User, ShoppingBag, Settings, Heart } from "lucide-react";
+import CartIcon from "@/components/icons/CartIcon";
+import FavoriteIcon from "@/components/icons/FavoriteIcon";
+import useStore from "@/store";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const favoritesCount = useStore((state) => state.getFavoriteCount());
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -44,12 +48,14 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/">Home</Link>
+            <Link href="/" className="hover:text-gray-700 transition-colors">
+              Home
+            </Link>
 
             {user?.role === "admin" && (
               <Link href="/dashboard">
                 <Button
-                  variant={pathname === "/admin/users" ? "default" : "ghost"}
+                  variant={pathname === "/dashboard" ? "default" : "ghost"}
                   size="sm"
                   className="flex items-center gap-2"
                 >
@@ -62,15 +68,18 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <FavoriteIcon />
+          <CartIcon />
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-8 w-8 rounded-full bg-sky-700"
+                  className="relative h-8 w-8 rounded-full bg-sky-700 hover:bg-sky-800"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-3xl font-bold text-purple-600 p-2">
+                    <AvatarFallback className="text-sm font-bold text-white bg-purple-600">
                       {user?.username?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -98,6 +107,18 @@ export default function Navbar() {
                   <Link href="/users/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cart" className="cursor-pointer">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Carts
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/favorites" className="cursor-pointer">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Wishlist ({favoritesCount})
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

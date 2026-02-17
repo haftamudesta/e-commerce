@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCartCount } from "@/store";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
