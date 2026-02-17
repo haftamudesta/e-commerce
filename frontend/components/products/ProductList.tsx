@@ -256,7 +256,7 @@ export default function ProductList({
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+      <div className="border border-red-200 rounded-lg p-6">
         <div className="flex items-start">
           <AlertCircle className="h-5 w-5 text-red-400 mt-0.5" />
           <div className="ml-3 flex-1">

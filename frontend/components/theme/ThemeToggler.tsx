@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Moon, Sun, Laptop } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,20 +15,34 @@ export default function ThemeToggler() {
   const isDarkMode = useIsDarkMode();
   const theme = useTheme();
   const setTheme = useSetTheme();
+  const [mounted, setMounted] = useState(false);
+  console.log("theme:", theme);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const root = document.documentElement;
+    console.log("🎨 Applying theme:", isDarkMode ? "dark" : "light");
+
     if (isDarkMode) {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
-  }, [isDarkMode]);
+    root.setAttribute("data-theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode, mounted]);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      console.log("📱 System theme changed:", e.matches ? "dark" : "light");
       if (theme === "system") {
         setTheme("system");
       }
@@ -37,7 +51,31 @@ export default function ThemeToggler() {
     mediaQuery.addEventListener("change", handleSystemThemeChange);
     return () =>
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
-  }, [theme, setTheme]);
+  }, [theme, setTheme, mounted]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const storedTheme = localStorage.getItem("theme-storage");
+    if (storedTheme) {
+      try {
+        const parsed = JSON.parse(storedTheme);
+        if (parsed.state) {
+          console.log("📦 Loaded stored theme:", parsed.state);
+        }
+      } catch (e) {
+        console.error("Error parsing stored theme:", e);
+      }
+    }
+    if (theme === "system") {
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      console.log(
+        "💻 Initial system theme:",
+        systemPrefersDark ? "dark" : "light",
+      );
+    }
+  }, [mounted, theme]);
 
   const getThemeIcon = () => {
     switch (theme) {
@@ -50,13 +88,25 @@ export default function ThemeToggler() {
     }
   };
 
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 rounded-full text-white hover:bg-white/20"
+      >
+        <Sun className="h-4 w-4" />
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="w-9 h-9 rounded-full hover:bg-white/20 transition-colors"
+          className="h-9 w-9 rounded-full text-white hover:bg-white/20"
           aria-label="Toggle theme"
         >
           {getThemeIcon()}
@@ -64,23 +114,34 @@ export default function ThemeToggler() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
-          onClick={() => setTheme("light")}
+          onClick={() => {
+            console.log("👆 Switching to light mode");
+            setTheme("light");
+          }}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Sun className="h-4 w-4" />
           <span>Light</span>
           {theme === "light" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
+
         <DropdownMenuItem
-          onClick={() => setTheme("dark")}
+          onClick={() => {
+            console.log("👆 Switching to dark mode");
+            setTheme("dark");
+          }}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Moon className="h-4 w-4" />
           <span>Dark</span>
           {theme === "dark" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
+
         <DropdownMenuItem
-          onClick={() => setTheme("system")}
+          onClick={() => {
+            console.log("👆 Switching to system mode");
+            setTheme("system");
+          }}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Laptop className="h-4 w-4" />

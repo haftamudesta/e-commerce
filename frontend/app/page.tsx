@@ -1,3 +1,5 @@
+"use client";
+
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProductList from "@/components/products/ProductList";
 

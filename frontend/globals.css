@@ -8,7 +8,6 @@
     --color-primary-300: #93c5fd;
     --color-primary-400: #60a5fa;
     --color-primary-500: #3b82f6;
-    /* Main primary */
     --color-primary-600: #2563eb;
     --color-primary-700: #1d4ed8;
     --color-primary-800: #1e40af;
@@ -21,7 +20,6 @@
     --color-secondary-300: #86efac;
     --color-secondary-400: #4ade80;
     --color-secondary-500: #22c55e;
-    /* Success, Add to cart */
     --color-secondary-600: #16a34a;
     --color-secondary-700: #15803d;
     --color-secondary-800: #166534;
@@ -34,7 +32,6 @@
     --color-accent-300: #fcd34d;
     --color-accent-400: #fbbf24;
     --color-accent-500: #f59e0b;
-    /* Sale, Discount */
     --color-accent-600: #d97706;
     --color-accent-700: #b45309;
     --color-accent-800: #92400e;
@@ -44,20 +41,17 @@
     --color-success: #22c55e;
     --color-success-light: #86efac;
     --color-success-dark: #16a34a;
-
     --color-error: #ef4444;
     --color-error-light: #fca5a5;
     --color-error-dark: #dc2626;
-
     --color-warning: #f59e0b;
     --color-warning-light: #fcd34d;
     --color-warning-dark: #d97706;
-
     --color-info: #3b82f6;
     --color-info-light: #93c5fd;
     --color-info-dark: #2563eb;
 
-    /*NEUTRAL/GRAY SCALE*/
+    /* NEUTRAL/GRAY SCALE - LIGHT MODE */
     --color-gray-50: #f9fafb;
     --color-gray-100: #f3f4f6;
     --color-gray-200: #e5e7eb;
@@ -70,7 +64,7 @@
     --color-gray-900: #111827;
     --color-gray-950: #030712;
 
-    /* Price Colors */
+    /* Price Colors - LIGHT MODE */
     --color-price: #111827;
     --color-price-discount: #dc2626;
     --color-price-original: #6b7280;
@@ -92,7 +86,7 @@
     --color-category-sports: #10b981;
     --color-category-books: #f59e0b;
 
-    /*TYPOGRAPHY*/
+    /* TYPOGRAPHY */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-display: 'Poppins', 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
@@ -108,6 +102,7 @@
     --text-4xl: 2.25rem;
     --text-5xl: 3rem;
 
+    /* Spacing */
     --spacing-0: 0px;
     --spacing-1: 0.25rem;
     --spacing-2: 0.5rem;
@@ -123,12 +118,14 @@
     --spacing-24: 6rem;
     --spacing-32: 8rem;
 
+    /* Containers */
     --container-sm: 640px;
     --container-md: 768px;
     --container-lg: 1024px;
     --container-xl: 1280px;
     --container-2xl: 1536px;
 
+    /* Border Radius */
     --radius-sm: 0.125rem;
     --radius-md: 0.375rem;
     --radius-lg: 0.5rem;
@@ -137,16 +134,19 @@
     --radius-3xl: 1.5rem;
     --radius-full: 9999px;
 
+    /* Shadows - LIGHT MODE */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
     --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
+    /* Colored Shadows */
     --shadow-primary: 0 10px 15px -3px rgb(59 130 246 / 0.2);
     --shadow-secondary: 0 10px 15px -3px rgb(34 197 94 / 0.2);
     --shadow-accent: 0 10px 15px -3px rgb(245 158 11 / 0.2);
 
+    /* Animations */
     --animate-fade-in: fadeIn 0.3s ease-in-out;
     --animate-fade-out: fadeOut 0.3s ease-in-out;
     --animate-slide-in: slideIn 0.3s ease-out;
@@ -266,6 +266,7 @@
         }
     }
 
+    /* Z-index layers */
     --z-dropdown: 1000;
     --z-sticky: 1020;
     --z-fixed: 1030;
@@ -278,6 +279,7 @@
     --z-cart-sidebar: 1200;
     --z-overlay: 1300;
 
+    /* Transitions */
     --transition-fast: 150ms;
     --transition-base: 250ms;
     --transition-slow: 350ms;
@@ -285,39 +287,96 @@
     --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ===== DARK MODE VARIABLES ===== */
+.dark {
+    /* Neutral/Gray Scale - DARK MODE */
+    --color-gray-50: #030712;
+    --color-gray-100: #111827;
+    --color-gray-200: #1f2937;
+    --color-gray-300: #374151;
+    --color-gray-400: #4b5563;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #9ca3af;
+    --color-gray-700: #d1d5db;
+    --color-gray-800: #e5e7eb;
+    --color-gray-900: #f3f4f6;
+    --color-gray-950: #f9fafb;
+
+    /* Price Colors - DARK MODE */
+    --color-price: #f3f4f6;
+    --color-price-original: #9ca3af;
+
+    /* Shadows - DARK MODE */
+    --shadow-sm: 0 1px 2px 0 rgb(255 255 255 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(255 255 255 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(255 255 255 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(255 255 255 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(255 255 255 / 0.25);
+
+    /* Colored Shadows - DARK MODE (more subtle) */
+    --shadow-primary: 0 10px 15px -3px rgb(59 130 246 / 0.3);
+    --shadow-secondary: 0 10px 15px -3px rgb(34 197 94 / 0.3);
+    --shadow-accent: 0 10px 15px -3px rgb(245 158 11 / 0.3);
+}
+
+/* Base styles */
+@layer base {
+    * {
+        @apply border-gray-200 dark:border-gray-700;
+    }
+
+    body {
+        @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+        font-family: var(--font-sans);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Smooth theme transition for all elements */
+    *,
+    *::before,
+    *::after {
+        transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+        transition-duration: 200ms;
+        transition-timing-function: ease;
+    }
+}
+
+/* Component styles */
 @layer components {
 
     /* Button Styles */
     .btn-primary {
-        @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-all duration-200;
+        @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-all duration-200 dark:bg-primary-700 dark:hover:bg-primary-800;
     }
 
     .btn-secondary {
-        @apply bg-secondary-600 text-white px-4 py-2 rounded-lg hover:bg-secondary-700 transition-all duration-200;
+        @apply bg-secondary-600 text-white px-4 py-2 rounded-lg hover:bg-secondary-700 transition-all duration-200 dark:bg-secondary-700 dark:hover:bg-secondary-800;
     }
 
     .btn-outline {
-        @apply border-2 border-primary-600 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-50 transition-all duration-200;
+        @apply border-2 border-primary-600 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-50 transition-all duration-200 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-gray-800;
     }
 
+    /* Card Styles */
     .product-card {
-        @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden;
+        @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden dark:bg-gray-900 dark:border-gray-800 dark:shadow-gray-900/50;
     }
 
     .product-card:hover {
         transform: translateY(-4px);
     }
 
+    /* Price Styles */
     .price-current {
-        @apply text-2xl font-bold text-gray-900;
+        @apply text-2xl font-bold text-gray-900 dark:text-gray-100;
     }
 
     .price-discount {
-        @apply text-lg text-gray-500 line-through ml-2;
+        @apply text-lg text-gray-500 line-through ml-2 dark:text-gray-400;
     }
 
     .price-sale {
-        @apply text-2xl font-bold text-red-600;
+        @apply text-2xl font-bold text-red-600 dark:text-red-400;
     }
 
     /* Rating Styles */
@@ -330,81 +389,92 @@
     }
 
     .rating-star-empty {
-        @apply w-5 h-5 text-rating-empty;
+        @apply w-5 h-5 text-gray-300 dark:text-gray-600;
     }
 
     /* Badge Styles */
     .badge-in-stock {
-        @apply bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full;
+        @apply bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200;
     }
 
     .badge-low-stock {
-        @apply bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full;
+        @apply bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full dark:bg-yellow-900 dark:text-yellow-200;
     }
 
     .badge-out-of-stock {
-        @apply bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full;
+        @apply bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full dark:bg-red-900 dark:text-red-200;
     }
 
     .badge-sale {
-        @apply bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse-subtle;
+        @apply bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse-subtle dark:bg-red-600;
     }
 
     .badge-new {
-        @apply bg-blue-500 text-white text-xs px-2 py-1 rounded-full;
+        @apply bg-blue-500 text-white text-xs px-2 py-1 rounded-full dark:bg-blue-600;
     }
 
+    /* Container */
     .container-custom {
         @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
     }
 
     /* Section Headers */
     .section-title {
-        @apply text-3xl font-bold text-gray-900 mb-8;
+        @apply text-3xl font-bold text-gray-900 mb-8 dark:text-gray-100;
     }
 
     .section-subtitle {
-        @apply text-lg text-gray-600 mb-4;
+        @apply text-lg text-gray-600 mb-4 dark:text-gray-400;
     }
 
     /* Cart & Wishlist */
     .cart-badge {
-        @apply absolute -top-2 -right-2 bg-secondary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center;
+        @apply absolute -top-2 -right-2 bg-secondary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center dark:bg-secondary-700;
     }
 
     .favorite-active {
-        @apply fill-red-500 text-red-500;
+        @apply fill-red-500 text-red-500 dark:fill-red-400 dark:text-red-400;
     }
 
     /* Loading States */
     .skeleton {
-        @apply animate-pulse bg-gray-200 rounded;
+        @apply animate-pulse bg-gray-200 rounded dark:bg-gray-700;
     }
 
+    /* Form Elements */
     .input-primary {
-        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-900 dark:border-gray-700 dark:text-white;
     }
 
     .select-primary {
-        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500;
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white;
     }
 
     /* Checkout Steps */
     .step-active {
-        @apply bg-primary-600 text-white;
+        @apply bg-primary-600 text-white dark:bg-primary-700;
     }
 
     .step-completed {
-        @apply bg-secondary-600 text-white;
+        @apply bg-secondary-600 text-white dark:bg-secondary-700;
     }
 
     .step-pending {
-        @apply bg-gray-200 text-gray-600;
+        @apply bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400;
+    }
+
+    /* Navbar */
+    .navbar-gradient {
+        background: linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%);
+    }
+
+    .dark .navbar-gradient {
+        background: linear-gradient(90deg, #1e1e2f 0%, #2d2d44 100%);
     }
 }
 
+/* Utility styles */
 @layer utilities {
-
     .text-balance {
         text-wrap: balance;
     }
@@ -459,39 +529,23 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+
+    /* Theme transition */
+    .theme-transition {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
 }
 
-/* ===== DARK MODE ===== */
-.dark {
-    --color-gray-50: #030712;
-    --color-gray-100: #111827;
-    --color-gray-200: #1f2937;
-    --color-gray-300: #374151;
-    --color-gray-400: #4b5563;
-    --color-gray-500: #6b7280;
-    --color-gray-600: #9ca3af;
-    --color-gray-700: #d1d5db;
-    --color-gray-800: #e5e7eb;
-    --color-gray-900: #f3f4f6;
-    --color-gray-950: #f9fafb;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-.dark body {
-    @apply bg-gray-950 text-gray-100;
+::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
 }
 
-.dark .product-card {
-    @apply bg-gray-900 border-gray-800;
-}
-
-.dark .price-current {
-    @apply text-gray-100;
-}
-
-.dark .section-title {
-    @apply text-gray-100;
-}
-
-.dark .section-subtitle {
-    @apply text-gray-300;
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500;
 }
