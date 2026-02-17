@@ -649,7 +649,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                 </div>
 
-                <div className="bg-slate-900 rounded-lg shadow p-6">
+                <div className="bg-slate-600 rounded-lg shadow p-6">
                   <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Additional Information
                   </h2>
