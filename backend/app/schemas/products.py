@@ -43,8 +43,6 @@ class ProductOut(ProductBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    
-    
     category_name: Optional[str] = None
     images: List[ProductImageSchema] = [] 
     primary_image: Optional[ProductImageSchema] = None
