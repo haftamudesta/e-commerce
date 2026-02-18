@@ -16,7 +16,7 @@ export default function ThemeToggler() {
   const theme = useTheme();
   const setTheme = useSetTheme();
   const [mounted, setMounted] = useState(false);
-  console.log("theme:", theme);
+  console.log("ThemeToggler - theme:", theme, "isDarkMode:", isDarkMode);
 
   useEffect(() => {
     setMounted(true);
@@ -26,7 +26,6 @@ export default function ThemeToggler() {
     if (!mounted) return;
 
     const root = document.documentElement;
-    console.log("🎨 Applying theme:", isDarkMode ? "dark" : "light");
 
     if (isDarkMode) {
       root.classList.add("dark");
@@ -44,6 +43,7 @@ export default function ThemeToggler() {
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       console.log("📱 System theme changed:", e.matches ? "dark" : "light");
       if (theme === "system") {
+        // This will trigger the store to re-evaluate system preference
         setTheme("system");
       }
     };
@@ -52,30 +52,6 @@ export default function ThemeToggler() {
     return () =>
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
   }, [theme, setTheme, mounted]);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const storedTheme = localStorage.getItem("theme-storage");
-    if (storedTheme) {
-      try {
-        const parsed = JSON.parse(storedTheme);
-        if (parsed.state) {
-          console.log("📦 Loaded stored theme:", parsed.state);
-        }
-      } catch (e) {
-        console.error("Error parsing stored theme:", e);
-      }
-    }
-    if (theme === "system") {
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      console.log(
-        "💻 Initial system theme:",
-        systemPrefersDark ? "dark" : "light",
-      );
-    }
-  }, [mounted, theme]);
 
   const getThemeIcon = () => {
     switch (theme) {
