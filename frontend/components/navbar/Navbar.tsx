@@ -38,7 +38,6 @@ export default function Navbar() {
   const isDarkMode = useStore((state) => state.isDarkMode);
   const [mounted, setMounted] = useState(false);
 
-  // Handle hydration
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -51,29 +50,26 @@ export default function Navbar() {
     }, 500);
   };
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
   if (!mounted) {
-    return null; // or a skeleton loader
+    return null;
   }
 
   return (
     <nav className="sticky top-0 z-50 transition-colors duration-300">
-      {/* Gradient Background with Theme Support */}
       <div
         className="absolute inset-0 -z-10 transition-colors duration-300"
         style={{
           background: isDarkMode
-            ? "linear-gradient(90deg, #1e293b 0%, #0f172a 100%)"
-            : "linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%)",
+            ? "linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%)"
+            : "linear-gradient(90deg, #1e293b 0%, #0f172a 100%)",
         }}
       />
 
       <div className="container-custom h-16 flex items-center justify-between">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <ShoppingBag
             size={32}
@@ -82,8 +78,6 @@ export default function Navbar() {
           />
           <span className="font-bold text-xl text-white">E-Commerce App</span>
         </Link>
-
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           <Link
             href="/"
@@ -123,14 +117,10 @@ export default function Navbar() {
             </Link>
           )}
         </div>
-
-        {/* Right Icons */}
         <div className="flex items-center gap-2">
-          <ThemeToggler />
           <FavoriteIcon />
           <CartIcon />
 
-          {/* User Menu */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -213,8 +203,6 @@ export default function Navbar() {
               </Link>
             </div>
           )}
-
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
@@ -225,7 +213,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800 shadow-lg">
           <div className="container-custom py-4 space-y-3">

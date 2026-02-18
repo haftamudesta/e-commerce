@@ -11,6 +11,7 @@ export default function ThemeProvider({
   const isDarkMode = useIsDarkMode();
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
+  console.log("ThemeProvider - theme:", theme, "isDarkMode:", isDarkMode);
 
   useEffect(() => {
     setMounted(true);
@@ -21,29 +22,22 @@ export default function ThemeProvider({
 
     const root = document.documentElement;
 
-    console.log("🎨 Applying theme:", {
-      isDarkMode,
-      theme,
-      willAddDark: isDarkMode,
-    });
-
-    // Force apply the class
+    // Apply dark class
     if (isDarkMode) {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
 
-    // Also set a data attribute for debugging
+    // Set data-theme attribute (now correctly matching isDarkMode)
     root.setAttribute("data-theme", isDarkMode ? "dark" : "light");
 
-    // Force a reflow to ensure styles are applied
-    document.body.style.display = "none";
-    document.body.offsetHeight; // Force reflow
-    document.body.style.display = "";
+    console.log(
+      "🎨 Theme applied - dark class:",
+      root.classList.contains("dark"),
+    );
   }, [isDarkMode, mounted]);
 
-  // Listen for system preference changes
   useEffect(() => {
     if (!mounted) return;
 
@@ -51,9 +45,7 @@ export default function ThemeProvider({
 
     const handleChange = (e: MediaQueryListEvent) => {
       console.log("📱 System theme changed:", e.matches ? "dark" : "light");
-      if (theme === "system") {
-        // The store will handle this
-      }
+      // The store will handle this via the setTheme logic when theme is "system"
     };
 
     mediaQuery.addEventListener("change", handleChange);
