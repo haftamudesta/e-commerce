@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.freecodecamp.org',
+        port: '',
+        pathname: '/curriculum/labs/**',
+      },
     ],
   },
   async rewrites() {
