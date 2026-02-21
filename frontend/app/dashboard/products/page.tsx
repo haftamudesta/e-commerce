@@ -9,15 +9,29 @@ function ProductsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div
+      className="min-h-screen bg-gray-50 py-8"
+      style={{
+        background:
+          "linear-gradient(145deg, #1b4d1b 0%, #2d6a2d 50%, #4f8a4f 100%)",
+        color: "#edf7ed",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div
+          className="mb-8 text-center py-6"
+          style={{
+            background: "#2d6a2d",
+            color: "#edf7ed",
+          }}
+        >
+          <h1 className="text-4xl font-bold text-white underline">
             Our Products
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Discover our wide range of high-quality products. From the latest
-            trends to timeless classics, find exactly what you're looking for.
+          <p className="text-lg text-sky-500 max-w-3xl mx-auto">
+            Browse our distinguished selection of fine products. Whether you
+            seek contemporary elegance or lasting tradition, you will find it
+            here.
           </p>
         </div>
 
@@ -37,13 +51,15 @@ function ProductsPageContent() {
                 <List size={20} />
               </button>
             </div>
-            <span className="text-sm text-gray-500">Showing all products</span>
+            <span className="text-xl text-white font-bold">
+              Showing all products
+            </span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-white">
             <Filter size={16} />
             <span>Sort by:</span>
-            <select className="border-none bg-transparent focus:outline-none focus:ring-0">
+            <select className="border-none bg-transparent focus:outline-none focus:ring-0 text-sky-400">
               <option>Latest</option>
               <option>Price: Low to High</option>
               <option>Price: High to Low</option>

@@ -69,7 +69,6 @@ export default function ProductList({
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
-  // API base URL - from environment or default
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -176,12 +175,10 @@ export default function ProductList({
   const getFullImageUrl = (imageUrl: string | undefined) => {
     if (!imageUrl) return null;
 
-    // If it's already a full URL, return as is
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
       return imageUrl;
     }
 
-    // Ensure the URL starts with a slash
     const cleanUrl = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
     return `${API_BASE_URL}${cleanUrl}`;
   };
@@ -241,9 +238,6 @@ export default function ProductList({
 
   const totalPages = Math.ceil(total / limit);
   const canAddProduct = user?.role === "admin" || user?.role === "seller";
-
-  // Log products for debugging
-  console.log("Products received:", products);
 
   if (loading && products.length === 0) {
     return (
