@@ -521,7 +521,12 @@ export default function ProductForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 "
+      style={{
+        background:
+          "linear-gradient(145deg, #0a4b6e 0%, #1e6f9f 50%, #3b9bd7 100%)",
+        color: "#f0faff",
+      }}
     >
       {(formError || contextError) && (
         <div className="rounded-md bg-red-50 p-4">
@@ -559,12 +564,18 @@ export default function ProductForm({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
+        <div className="lg:col-span-1 space-y-6 mt-4">
+          <div
+            className="bg-white rounded-lg border border-gray-200 p-6"
+            style={{
+              background: "#1e6f9f",
+              color: "#fff",
+            }}
+          >
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Product Images
-              <span className="ml-2 text-sm font-normal text-gray-500">
+              <span className="ml-2 text-sm font-normal text-gray-900">
                 ({images.length} uploaded)
               </span>
             </h3>
@@ -680,7 +691,7 @@ export default function ProductForm({
               >
                 <Upload className="mx-auto h-8 w-8 text-gray-400" />
                 <div className="mt-2">
-                  <label className="cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
+                  <label className="cursor-pointer rounded-md font-medium text-white hover:text-blue-500">
                     <span>Click to upload</span>
                     <input
                       type="file"
@@ -691,11 +702,8 @@ export default function ProductForm({
                       disabled={isLoading}
                     />
                   </label>
-                  <span className="text-sm text-gray-500">
-                    {" "}
-                    or drag and drop
-                  </span>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <span className="text-sm text-white"> or drag and drop</span>
+                  <p className="text-xs text-white mt-1">
                     PNG, JPG, GIF up to 10MB each
                   </p>
                 </div>
@@ -753,8 +761,13 @@ export default function ProductForm({
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="lg:col-span-2 space-y-6 mt-4">
+          <div
+            className="bg-white rounded-lg border border-gray-200 p-6"
+            style={{
+              background: "#0a4b6e",
+            }}
+          >
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Basic Information
             </h3>
@@ -763,7 +776,7 @@ export default function ProductForm({
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-white"
                 >
                   Product Name <span className="text-red-500">*</span>
                 </label>
@@ -787,7 +800,7 @@ export default function ProductForm({
               <div>
                 <label
                   htmlFor="slug"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-white"
                 >
                   URL Slug
                 </label>
@@ -806,7 +819,7 @@ export default function ProductForm({
                     {errors.slug.message}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-sky-500 font-bold">
                   Leave empty to auto-generate from product name
                 </p>
               </div>
@@ -814,7 +827,7 @@ export default function ProductForm({
               <div>
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-white"
                 >
                   Description
                 </label>
@@ -898,13 +911,18 @@ export default function ProductForm({
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div
+            className="bg-white rounded-lg border border-gray-200 p-6"
+            style={{
+              background: "#0a4b6e",
+            }}
+          >
             <h3 className="text-lg font-medium text-gray-900 mb-4">Category</h3>
 
             <div>
               <label
                 htmlFor="category_id"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-white"
               >
                 Category
               </label>
@@ -935,7 +953,7 @@ export default function ProductForm({
                   {errors.category_id.message}
                 </p>
               )}
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-sky-500 font-bold">
                 Select a category to help customers find your product
               </p>
             </div>
