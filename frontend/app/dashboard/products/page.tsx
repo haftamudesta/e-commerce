@@ -69,7 +69,12 @@ function ProductsPageContent() {
         </div>
 
         <div className="bg-white rounded-lg shadow">
-          <div className="p-6">
+          <div
+            className="p-6"
+            style={{
+              background: "#1b4d1b",
+            }}
+          >
             <ProductList showFilters />
           </div>
         </div>

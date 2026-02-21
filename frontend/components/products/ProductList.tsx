@@ -280,8 +280,8 @@ export default function ProductList({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-emerald-500">Products</h1>
+          <p className="text-sm text-white mt-1">
             {total} product{total !== 1 ? "s" : ""} found
           </p>
         </div>
@@ -343,14 +343,15 @@ export default function ProductList({
                 Search
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500 h-5 w-5" />
                 <input
                   type="text"
                   value={filters.search}
                   onChange={(e) => handleFilterChange("search", e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Search products..."
-                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  text-emerald-500"
                 />
               </div>
             </div>
@@ -361,7 +362,8 @@ export default function ProductList({
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                text-emerald-500"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -378,7 +380,8 @@ export default function ProductList({
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                text-emerald-500"
               >
                 <option value="">All Status</option>
                 <option value="draft">Draft</option>
@@ -393,7 +396,7 @@ export default function ProductList({
                   Min Price
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500">
                     $
                   </span>
                   <input
@@ -406,7 +409,8 @@ export default function ProductList({
                     placeholder="0"
                     min="0"
                     step="0.01"
-                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    text-emerald-500"
                   />
                 </div>
               </div>
@@ -415,7 +419,7 @@ export default function ProductList({
                   Max Price
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500">
                     $
                   </span>
                   <input
@@ -428,7 +432,8 @@ export default function ProductList({
                     placeholder="Any"
                     min="0"
                     step="0.01"
-                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    text-emerald-500"
                   />
                 </div>
               </div>
@@ -475,7 +480,6 @@ export default function ProductList({
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => {
-              // Safely access images - ensure images is always an array
               const images = product.images || [];
               const primaryImage =
                 product.primary_image ||
@@ -485,19 +489,13 @@ export default function ProductList({
                 primaryImage?.image_url && !imageErrors[product.id];
               const fullImageUrl = getFullImageUrl(primaryImage?.image_url);
 
-              // Log image URL for debugging
-              if (primaryImage?.image_url) {
-                console.log(`Product ${product.id} image URL:`, {
-                  original: primaryImage.image_url,
-                  full: fullImageUrl,
-                  hasImage,
-                });
-              }
-
               return (
                 <div
                   key={product.id}
                   className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  style={{
+                    background: "#368036",
+                  }}
                 >
                   <Link
                     href={`/dashboard/products/${product.id}`}
@@ -506,7 +504,6 @@ export default function ProductList({
                     <div className="relative h-56 bg-gray-100 overflow-hidden">
                       {hasImage && fullImageUrl ? (
                         <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={fullImageUrl}
                             alt={primaryImage?.alt_text || product.name}
@@ -571,7 +568,7 @@ export default function ProductList({
                       </h3>
                     </Link>
 
-                    <p className="text-gray-500 text-sm mb-3 line-clamp-2">
+                    <p className="text-sky-300 text-sm mb-3 line-clamp-2">
                       {product.description || "No description available"}
                     </p>
 
@@ -599,7 +596,7 @@ export default function ProductList({
                         <div className="flex gap-2">
                           <Link
                             href={`/dashboard/products/${product.id}/edit`}
-                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-accent-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit Product"
                           >
                             <Edit size={18} />
@@ -607,7 +604,7 @@ export default function ProductList({
                           <button
                             onClick={() => handleDelete(product.id)}
                             disabled={deletingId === product.id}
-                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete Product"
                           >
                             {deletingId === product.id ? (
