@@ -38,6 +38,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     deleteProduct,
     clearCurrentProduct,
     clearError,
+    updateProduct,
   } = useProducts();
 
   const { stats, fetchStats } = useReviews();
@@ -100,6 +101,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       slug: currentProduct.slug || undefined,
     });
     currentProduct.quantity = currentProduct.quantity - 1;
+    const updatedProduct = {
+      ...currentProduct,
+      quantity: currentProduct.quantity,
+    };
+    await updateProduct(currentProduct.id, updatedProduct);
 
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
