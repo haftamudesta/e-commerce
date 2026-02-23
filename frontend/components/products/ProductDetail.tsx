@@ -300,11 +300,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
           {activeTab === "details" ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Images */}
               <div className="space-y-4">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4">
-                  {/* Main Image */}
-                  <div className="relative aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                  <div
+                    className="relative aspect-square dark:bg-gray-700 rounded-lg overflow-hidden"
+                    style={{
+                      background: "#1e6f9f",
+                    }}
+                  >
                     {hasImages && fullImageUrl && !hasImageError ? (
                       <>
                         <img
@@ -328,7 +331,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                           </div>
                         )}
 
-                        {/* Image Navigation */}
                         {images.length > 1 && (
                           <>
                             <button
@@ -347,8 +349,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                             </button>
                           </>
                         )}
-
-                        {/* Image Counter */}
                         {images.length > 1 && (
                           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                             {selectedImage + 1} / {images.length}
@@ -366,8 +366,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                       </div>
                     )}
                   </div>
-
-                  {/* Thumbnail Grid */}
                   {images.length > 1 && (
                     <div className="grid grid-cols-5 gap-2 mt-4">
                       {images.map((image, index) => {
@@ -414,9 +412,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   )}
                 </div>
 
-                {/* Admin Actions */}
                 {(user?.role === "admin" || user?.role === "seller") && (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4">
+                  <div
+                    className=" dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4"
+                    style={{
+                      background: "#1e6f9f",
+                    }}
+                  >
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
                       Manage Product
                     </h3>
@@ -445,10 +447,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                 )}
 
-                {/* Reviews Summary Card */}
                 {stats && stats.total_reviews > 0 && (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4">
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <div
+                    className=" dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4"
+                    style={{
+                      background: "#0a4b6e",
+                    }}
+                  >
+                    <h3 className="font-bold text-sky-500 dark:text-white mb-3 flex items-center gap-2">
                       <Star className="text-rating fill-current" />
                       Customer Reviews
                     </h3>
@@ -485,9 +491,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 )}
               </div>
 
-              {/* Right Column - Product Info */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-6">
+                <div
+                  className=" dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-6"
+                  style={{
+                    background: "#0a4b6e",
+                  }}
+                >
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
@@ -685,7 +695,12 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-6">
+                <div
+                  className=" dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-6"
+                  style={{
+                    background: "#0a4b6e",
+                  }}
+                >
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Additional Information
                   </h2>

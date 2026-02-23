@@ -236,7 +236,7 @@ export default function ProductReviews({
     <div className="space-y-8">
       {showTitle && (
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
+          <h2 className="text-2xl font-bold text-sky-500">Customer Reviews</h2>
           {user && !userHasReviewed && !showForm && (
             <button
               onClick={() => setShowForm(true)}
