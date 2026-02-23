@@ -88,7 +88,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!currentProduct) return;
 
     addToCart({
@@ -100,6 +100,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       slug: currentProduct.slug || undefined,
     });
     currentProduct.quantity = currentProduct.quantity - 1;
+
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };

@@ -166,7 +166,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
     try {
       console.log(`🔍 Fetching product ${id} with images...`);
-      // Use the correct method that includes images
       const product = await productsAPI.getProductWithImages(id);
       console.log("✅ Product data received:", product);
       console.log("📸 Images in product:", product.images);
