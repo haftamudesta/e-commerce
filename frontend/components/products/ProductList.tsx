@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,7 +78,7 @@ export default function ProductList({
       limit: initialLimit,
       categoryId,
     });
-  }, [categoryId, initialPage, initialLimit, fetchProducts]);
+  }, []);
 
   useEffect(() => {
     setSelectedCategory(categoryId?.toString() || "");
@@ -107,7 +107,7 @@ export default function ProductList({
     fetchProducts({
       page: 1,
       limit,
-      categoryId: selectedCategory ? parseInt(selectedCategory) : undefined,
+      categoryId: selectedCategory ? parseInt(selectedCategory) : categoryId,
       status: filters.status || undefined,
       minPrice: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
       maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
@@ -168,7 +168,6 @@ export default function ProductList({
   };
 
   const handleImageLoad = (productId: number) => {
-    console.log(`Image loaded successfully for product ${productId}`);
     setLoadedImages((prev) => ({ ...prev, [productId]: true }));
   };
 
@@ -350,8 +349,7 @@ export default function ProductList({
                   onChange={(e) => handleFilterChange("search", e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Search products..."
-                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                  text-emerald-500"
+                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-emerald-500"
                 />
               </div>
             </div>
@@ -362,8 +360,7 @@ export default function ProductList({
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                text-emerald-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-emerald-500"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -380,8 +377,7 @@ export default function ProductList({
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                text-emerald-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-emerald-500"
               >
                 <option value="">All Status</option>
                 <option value="draft">Draft</option>
@@ -409,8 +405,7 @@ export default function ProductList({
                     placeholder="0"
                     min="0"
                     step="0.01"
-                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    text-emerald-500"
+                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-emerald-500"
                   />
                 </div>
               </div>
@@ -432,8 +427,7 @@ export default function ProductList({
                     placeholder="Any"
                     min="0"
                     step="0.01"
-                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    text-emerald-500"
+                    className="pl-7 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-emerald-500"
                   />
                 </div>
               </div>
@@ -492,7 +486,7 @@ export default function ProductList({
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  className="group rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                   style={{
                     background: "#368036",
                   }}
@@ -632,7 +626,9 @@ export default function ProductList({
                 <select
                   value={limit}
                   onChange={(e) => handleLimitChange(parseInt(e.target.value))}
-                  className="ml-2 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="ml-2 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500
+                  text-emerald-300 font-bold
+                  "
                 >
                   <option value={12}>12 per page</option>
                   <option value={24}>24 per page</option>

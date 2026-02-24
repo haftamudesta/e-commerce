@@ -1,7 +1,4 @@
-# Run the seed script
-# python scripts/seed.py
-
-# Or run directly
+# run directly
 # python -m app.database.seed
 
 import asyncio

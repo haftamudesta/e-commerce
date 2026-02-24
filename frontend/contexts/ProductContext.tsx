@@ -143,6 +143,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           maxPrice,
           search,
         });
+        console.log("product response:", response.products);
         setProducts(response.products);
         setTotal(response.total);
         setPage(response.page);

@@ -11,7 +11,6 @@ export default function ThemeProvider({
   const isDarkMode = useIsDarkMode();
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
-  console.log("ThemeProvider - theme:", theme, "isDarkMode:", isDarkMode);
 
   useEffect(() => {
     setMounted(true);
@@ -22,20 +21,13 @@ export default function ThemeProvider({
 
     const root = document.documentElement;
 
-    // Apply dark class
     if (isDarkMode) {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
 
-    // Set data-theme attribute (now correctly matching isDarkMode)
     root.setAttribute("data-theme", isDarkMode ? "dark" : "light");
-
-    console.log(
-      "🎨 Theme applied - dark class:",
-      root.classList.contains("dark"),
-    );
   }, [isDarkMode, mounted]);
 
   useEffect(() => {
@@ -45,14 +37,12 @@ export default function ThemeProvider({
 
     const handleChange = (e: MediaQueryListEvent) => {
       console.log("📱 System theme changed:", e.matches ? "dark" : "light");
-      // The store will handle this via the setTheme logic when theme is "system"
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, mounted]);
 
-  // Prevent flash of wrong theme
   if (!mounted) {
     return <div style={{ visibility: "hidden" }}>{children}</div>;
   }
