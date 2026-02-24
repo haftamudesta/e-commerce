@@ -7,8 +7,9 @@ requires-python = ">=3.14"
 dependencies = [
     "aiofiles>=25.1.0",
     "aiosqlite>=0.22.1",
+    "bcrypt==3.2.0",
     "fastapi[standard]>=0.128.0",
-    "passlib[argon2]>=1.7.4",
+    "passlib[argon2,bcrypt]>=1.7.4",
     "pydantic[all]>=2.12.5",
     "python-jose[cryptography]>=3.5.0",
     "python-multipart>=0.0.22",
