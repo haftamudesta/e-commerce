@@ -86,7 +86,7 @@ export default function Navbar() {
             Home
           </Link>
           <Link
-            href="/products"
+            href="/users/products"
             className="text-white/90 hover:text-white transition-colors"
           >
             Products
