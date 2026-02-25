@@ -24,7 +24,7 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-opacity-40" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-emerald-400 bg-white text-center max-w-2xl px-4 py-6 text-lg md:text-xl font-medium w-1/2 rounded-full">
+            <p className="text-emerald-400 bg-white text-center max-w-2xl px-4 py-6 text-lg md:text-xl font-medium w-full lg:w-1/2 rounded-full">
               Welcome to My E-commerce App! I am here to satisfy your every
               desire, offering a handpicked collection of the best products just
               for you. Sit back, browse, and let me take care of the rest. Happy
@@ -32,8 +32,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-
-        {/* Products List */}
         <ProductList />
       </main>
     </ProtectedRoute>

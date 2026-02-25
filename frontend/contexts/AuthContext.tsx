@@ -76,11 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData =
         profileResponse.data.user_details || profileResponse.data;
 
-      console.log("✅ Profile fetched:", userData);
-
       authUtils.setAuthData(access_token, userData);
       setUser(userData);
-
       toast({
         title: "Success",
         description: "Logged in successfully",
