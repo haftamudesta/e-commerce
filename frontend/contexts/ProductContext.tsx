@@ -143,7 +143,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           maxPrice,
           search,
         });
-        console.log("product response:", response.products);
         setProducts(response.products);
         setTotal(response.total);
         setPage(response.page);
@@ -154,7 +153,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to fetch products";
         setError(errorMsg);
-        console.error("Error fetching products:", err);
       } finally {
         setLoading(false);
       }
@@ -166,17 +164,12 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true);
     setError(null);
     try {
-      console.log(`🔍 Fetching product ${id} with images...`);
       const product = await productsAPI.getProductWithImages(id);
-      console.log("✅ Product data received:", product);
-      console.log("📸 Images in product:", product.images);
-
       setCurrentProduct(product);
     } catch (err: any) {
       const errorMsg =
         err.response?.data?.detail || err.message || "Failed to fetch product";
       setError(errorMsg);
-      console.error("❌ Error fetching product:", err);
     } finally {
       setLoading(false);
     }
@@ -202,7 +195,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to create product";
         setError(errorMsg);
-        console.error("Error creating product:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -234,7 +226,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to update product";
         setError(errorMsg);
-        console.error("Error updating product:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -260,7 +251,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to delete product";
         setError(errorMsg);
-        console.error("Error deleting product:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -282,7 +272,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to search products";
         setError(errorMsg);
-        console.error("Error searching products:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -312,7 +301,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to fetch products by category";
         setError(errorMsg);
-        console.error("Error fetching products by category:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -394,7 +382,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
         const errorMsg =
           err.response?.data?.detail || err.message || "Failed to upload image";
         setError(errorMsg);
-        console.error("Error uploading image:", err);
         throw err;
       } finally {
         setUploading(false);
@@ -467,7 +454,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to upload images";
         setError(errorMsg);
-        console.error("Error uploading images:", err);
         throw err;
       } finally {
         setUploading(false);
@@ -530,7 +516,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
         const errorMsg =
           err.response?.data?.detail || err.message || "Failed to delete image";
         setError(errorMsg);
-        console.error("Error deleting image:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -611,7 +596,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
         const errorMsg =
           err.response?.data?.detail || err.message || "Failed to update image";
         setError(errorMsg);
-        console.error("Error updating image:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -679,7 +663,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message ||
           "Failed to reorder images";
         setError(errorMsg);
-        console.error("Error reordering images:", err);
         throw err;
       } finally {
         setLoading(false);
@@ -716,7 +699,6 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({
         err.message ||
         "Failed to fetch product with reviews";
       setError(errorMsg);
-      console.error("Error fetching product with reviews:", err);
     } finally {
       setLoading(false);
     }

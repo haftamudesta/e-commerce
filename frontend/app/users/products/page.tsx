@@ -27,7 +27,7 @@ function ProductsPageContent() {
             color: "#edf7ed",
           }}
         >
-          <h1 className="text-4xl font-bold text-white underline">
+          <h1 className="text-4xl font-bold text-white underline mb-4">
             Our Products
           </h1>
           <p className="text-lg text-sky-500 max-w-3xl mx-auto">
