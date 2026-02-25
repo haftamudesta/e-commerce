@@ -4,12 +4,13 @@ import { Suspense } from "react";
 import ProductList from "@/components/products/ProductList";
 import { Filter, Grid, List } from "lucide-react";
 import { useState } from "react";
-import 
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 function ProductsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   return (
+    <ProtectedRoute>
     <div
       className="min-h-screen bg-gray-50 py-8"
       style={{
@@ -157,6 +158,7 @@ function ProductsPageContent() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
 
