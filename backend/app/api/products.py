@@ -410,6 +410,29 @@ async def get_products_by_category(
     
     product_list = []
     for product in products:
+        images = [
+            ProductImageSchema(
+                id=img.id,
+                image_url=img.image_url,
+                thumbnail_url=img.thumbnail_url,
+                alt_text=img.alt_text,
+                is_primary=img.is_primary,
+                display_order=img.display_order
+            )
+            for img in product.images
+        ]
+        
+        primary_image = None
+        if product.primary_image:
+            primary_image = ProductImageSchema(
+                id=product.primary_image.id,
+                image_url=product.primary_image.image_url,
+                thumbnail_url=product.primary_image.thumbnail_url,
+                alt_text=product.primary_image.alt_text,
+                is_primary=product.primary_image.is_primary,
+                display_order=product.primary_image.display_order
+            )
+        
         product_out = ProductOut(
             id=product.id,
             name=product.name,
@@ -419,6 +442,9 @@ async def get_products_by_category(
             slug=product.slug,
             status=product.status,
             category_id=product.category_id,
+            category_name=product.category.name if product.category else None,
+            images=images,  
+            primary_image=primary_image,  
             created_at=product.created_at,
             updated_at=product.updated_at
         )
@@ -432,6 +458,7 @@ async def get_products_by_category(
         page=page,
         limit=limit
     )
+
 
 @router.get("/search/", response_model=List[ProductOut])
 async def search_products(

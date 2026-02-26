@@ -112,12 +112,12 @@ export const productsAPI = {
   },
 
   getByCategory: async (categoryId: number, page = 1, limit = 12): Promise<ProductsResponse> => {
-    const skip = (page - 1) * limit;
-    const response = await api.get(
-      `/api/v1/products/category/${categoryId}?skip=${skip}&limit=${limit}`
-    );
-    return response.data;
-  },
+  const skip = (page - 1) * limit;
+  const response = await api.get(
+    `/api/v1/products/category/${categoryId}?skip=${skip}&limit=${limit}&include_images=true`
+  );
+  return response.data;
+},
 
   uploadImages: async (
     productId: number, 
