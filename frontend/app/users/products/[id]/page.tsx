@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import ProductDetail from "@/components/products/ProductDetail";
 import { Suspense } from "react";
+import Link from "next/link";
 
 function ProductPageContent() {
   const params = useParams();
@@ -31,12 +32,12 @@ function ProductPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ProductDetail productId={productId} />
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Related Products
-          </h2>
-          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-white">Related products will appear here</p>
-          </div>
+          <Link
+            href={"/contact"}
+            className="text-2xl font-bold text-gray-800 mb-6"
+          >
+            Would love to hear your feedback.Message me anytime
+          </Link>
         </div>
       </div>
     </div>
