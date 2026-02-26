@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Image as ImageIcon, ShoppingCart } from "lucide-react";
 import { useProducts } from "@/contexts/ProductContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface RelatedProductsProps {
   productId: number;
@@ -22,51 +23,25 @@ export default function RelatedProducts({
   const [loading, setLoading] = useState(true);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [debugInfo, setDebugInfo] = useState<any>({});
+  const { user } = useAuth();
 
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      console.log("🔍 RelatedProducts mounted with:", {
-        productId,
-        categoryId,
-        limit,
-      });
-
       if (!categoryId) {
-        console.log("❌ No categoryId provided");
         setLoading(false);
         return;
       }
 
       try {
-        console.log(`📡 Fetching products for category: ${categoryId}`);
         const response = await getProductsByCategory(categoryId, 1, limit + 1);
-        console.log("📦 Raw API response:", response);
-
-        // Filter out the current product
         const filtered = response.products.filter(
           (p: any) => p.id !== productId,
         );
-        console.log("🔍 Filtered products (excluding current):", filtered);
-
         setProducts(filtered.slice(0, limit));
-
-        // Log each product's image data
-        filtered.slice(0, limit).forEach((p: any, index: number) => {
-          console.log(`📸 Product ${index + 1} (ID: ${p.id}):`, {
-            name: p.name,
-            hasImages: !!p.images,
-            imagesLength: p.images?.length,
-            hasPrimaryImage: !!p.primary_image,
-            primaryImage: p.primary_image,
-            firstImage: p.images?.[0],
-            fullProduct: p,
-          });
-        });
       } catch (error) {
-        console.error("❌ Error fetching related products:", error);
       } finally {
         setLoading(false);
       }
@@ -77,30 +52,20 @@ export default function RelatedProducts({
 
   const getFullImageUrl = (imageUrl: string | undefined) => {
     if (!imageUrl) {
-      console.log("⚠️ getFullImageUrl: No image URL provided");
       return null;
     }
 
-    console.log("🖼️ getFullImageUrl - Original URL:", imageUrl);
-
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-      console.log("✅ Using full URL:", imageUrl);
       return imageUrl;
     }
 
     const cleanUrl = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
     const fullUrl = `${API_BASE_URL}${cleanUrl}`;
-    console.log("🔧 Constructed URL:", fullUrl);
     return fullUrl;
   };
 
   const handleImageError = (productId: number, imageUrl: string) => {
-    console.log(`❌ Image failed to load for product ${productId}:`, imageUrl);
     setImageErrors((prev) => ({ ...prev, [productId]: true }));
-  };
-
-  const handleImageLoad = (productId: number) => {
-    console.log(`✅ Image loaded successfully for product ${productId}`);
   };
 
   if (loading) {
@@ -123,7 +88,6 @@ export default function RelatedProducts({
   }
 
   if (products.length === 0) {
-    console.log("ℹ️ No related products to display");
     return (
       <div className="mt-12 text-center py-8">
         <p className="text-gray-500 dark:text-gray-400">
@@ -133,8 +97,6 @@ export default function RelatedProducts({
     );
   }
 
-  console.log("🎨 Rendering related products:", products.length);
-
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
@@ -143,29 +105,14 @@ export default function RelatedProducts({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => {
-          console.log(`🔄 Rendering product ${product.id}:`, product.name);
-
-          // EXACT SAME PATTERN as ProductList
           const images = product.images || [];
           const primaryImage =
             product.primary_image ||
             images.find((img: any) => img?.is_primary) ||
             images[0];
 
-          console.log(`📸 Product ${product.id} image data:`, {
-            images,
-            primaryImage,
-            imageUrl: primaryImage?.image_url,
-          });
-
           const hasImage = primaryImage?.image_url && !imageErrors[product.id];
           const fullImageUrl = getFullImageUrl(primaryImage?.image_url);
-
-          console.log(`🔗 Product ${product.id} final image URL:`, {
-            hasImage,
-            fullImageUrl,
-            imageError: imageErrors[product.id],
-          });
 
           const productPrice =
             typeof product.price === "string"
@@ -173,20 +120,14 @@ export default function RelatedProducts({
               : product.price;
 
           return (
-            <Link
-              key={product.id}
-              href={`/products/${product.id}`}
-              className="group"
-            >
+            <div className="group" key={product.id}>
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                {/* Product Image */}
                 <div className="relative h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden">
                   {hasImage && fullImageUrl ? (
                     <img
                       src={fullImageUrl}
                       alt={primaryImage?.alt_text || product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onLoad={() => handleImageLoad(product.id)}
                       onError={() => handleImageError(product.id, fullImageUrl)}
                     />
                   ) : (
@@ -204,8 +145,6 @@ export default function RelatedProducts({
                       )}
                     </div>
                   )}
-
-                  {/* Quick Add Button */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <button
                       className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium transform scale-90 group-hover:scale-100 transition-transform flex items-center gap-2 hover:bg-primary-600 hover:text-white"
@@ -220,8 +159,6 @@ export default function RelatedProducts({
                     </button>
                   </div>
                 </div>
-
-                {/* Product Info */}
                 <div className="p-4">
                   <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-gray-900 dark:text-white">
                     {product.name}
@@ -238,8 +175,21 @@ export default function RelatedProducts({
                     )}
                   </div>
                 </div>
+                <div className="text-sky-400">
+                  <Link
+                    key={product.id}
+                    href={
+                      user?.role == "admin"
+                        ? `/dashboard/products/${product.id}`
+                        : `/users/products/${product.id}`
+                    }
+                    className="font-bold ml-6 mb-4"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>

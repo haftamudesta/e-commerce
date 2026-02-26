@@ -163,7 +163,6 @@ export default function ProductList({
   };
 
   const handleImageError = (productId: number) => {
-    console.log(`Image failed to load for product ${productId}`);
     setImageErrors((prev) => ({ ...prev, [productId]: true }));
   };
 

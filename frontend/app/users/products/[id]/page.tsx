@@ -31,12 +31,12 @@ function ProductPageContent() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ProductDetail productId={productId} />
-        <div className="mt-12">
+        <div className="mt-12 text-center">
           <Link
             href={"/contact"}
-            className="text-2xl font-bold text-gray-800 mb-6"
+            className="text-2xl font-bold text-shadow-sky-400 mb-6 bg-sky-700 p-4 rounded-3xl animate-pulse"
           >
-            Would love to hear your feedback.Message me anytime
+            Would love to hear your feedback. Message me anytime
           </Link>
         </div>
       </div>

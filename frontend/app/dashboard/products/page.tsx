@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import ProductList from "@/components/products/ProductList";
 import { Filter, Grid, List } from "lucide-react";
 import { useState } from "react";
-import 
 
 function ProductsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

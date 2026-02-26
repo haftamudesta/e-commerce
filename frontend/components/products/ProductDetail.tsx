@@ -85,10 +85,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             1,
             4,
           );
-          // Filter out current product
           const filtered = response.products.filter((p) => p.id !== productId);
           setRelatedProducts(filtered);
-          console.log("Related products:", filtered);
         } catch (error) {
           console.error("Error fetching related products:", error);
         } finally {
@@ -98,7 +96,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     };
     fetchRelated();
   }, [currentProduct, getProductsByCategory, productId]);
-  console.log("related products:", relatedProducts);
   const handleDelete = async () => {
     if (
       window.confirm(
@@ -190,12 +187,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   };
 
   const handleImageError = (imageId: number) => {
-    console.log(`Image failed to load for image ID ${imageId}`);
     setImageErrors((prev) => ({ ...prev, [imageId]: true }));
   };
 
   const handleImageLoad = (imageId: number) => {
-    console.log(`Image loaded successfully for image ID ${imageId}`);
     setLoadedImages((prev) => ({ ...prev, [imageId]: true }));
   };
 
