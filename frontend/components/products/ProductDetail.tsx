@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useReviews } from "@/contexts/ReviewContext";
 import { useAuth } from "@/contexts/AuthContext";
+import RelatedProducts from "./RelatedProducts";
 import useStore, { useIsFavorite } from "@/store";
 import {
   Edit,
@@ -39,6 +40,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     clearCurrentProduct,
     clearError,
     updateProduct,
+    getProductsByCategory,
   } = useProducts();
 
   const { stats, fetchStats } = useReviews();
@@ -57,6 +59,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
   const [addedToCart, setAddedToCart] = useState(false);
   const [favoriteAnimating, setFavoriteAnimating] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -71,6 +75,30 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     };
   }, [productId, fetchProduct, fetchStats, clearCurrentProduct]);
 
+  useEffect(() => {
+    const fetchRelated = async () => {
+      if (currentProduct?.category_id) {
+        setLoadingRelated(true);
+        try {
+          const response = await getProductsByCategory(
+            currentProduct.category_id,
+            1,
+            4,
+          );
+          // Filter out current product
+          const filtered = response.products.filter((p) => p.id !== productId);
+          setRelatedProducts(filtered);
+          console.log("Related products:", filtered);
+        } catch (error) {
+          console.error("Error fetching related products:", error);
+        } finally {
+          setLoadingRelated(false);
+        }
+      }
+    };
+    fetchRelated();
+  }, [currentProduct, getProductsByCategory, productId]);
+  console.log("related products:", relatedProducts);
   const handleDelete = async () => {
     if (
       window.confirm(
@@ -744,6 +772,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               />
             </div>
           )}
+          <RelatedProducts
+            productId={productId}
+            categoryId={currentProduct.category_id}
+            limit={4}
+          />
         </>
       )}
     </div>
