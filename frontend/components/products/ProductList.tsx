@@ -579,7 +579,11 @@ export default function ProductList({
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <Link
-                        href={user.role==="admin" || user.role === "seller" ?`/dashboard/products/${product.id}`:`/users/products/${product.id}`}
+                        href={
+                          user?.role === "admin" || user?.role === "seller"
+                            ? `/dashboard/products/${product.id}`
+                            : `/users/products/${product.id}`
+                        }
                         className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                       >
                         <Eye size={18} />
