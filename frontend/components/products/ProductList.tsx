@@ -23,6 +23,7 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
+import ProductSidemenu from "./ProductSideMenu";
 
 interface ProductListProps {
   categoryId?: number;
@@ -614,6 +615,7 @@ export default function ProductList({
                       )}
                     </div>
                   </div>
+                  <ProductSidemenu product={product} />
                 </div>
               );
             })}
