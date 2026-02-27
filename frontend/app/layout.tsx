@@ -7,7 +7,7 @@ import { ProductsProvider } from "@/contexts/ProductContext";
 import { ReviewsProvider } from "@/contexts/ReviewContext";
 import "../globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
-import ThemeScript from "@/components/theme/ThemeScript";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +43,21 @@ export default function RootLayout({
                   <main className="container mx-auto px-4 py-8">
                     {children}
                   </main>
+                  <Toaster
+                    position="top-right"
+                    richColors
+                    closeButton
+                    theme="system"
+                    toastOptions={{
+                      style: {
+                        background: "var(--color-gray-800)",
+                        color: "var(--color-gray-100)",
+                        border: "1px solid var(--color-gray-700)",
+                      },
+                      className: "font-sans",
+                      duration: 4000,
+                    }}
+                  />
                 </ThemeProvider>
               </ReviewsProvider>
             </ProductsProvider>
