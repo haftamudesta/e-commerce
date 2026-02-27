@@ -127,7 +127,7 @@ const ProductSidemenu = ({ product, className }: ProductSidemenuProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>Quick view</p>
+              <p className="text-accent-400 text-xl font-bold">Quick view</p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -146,7 +146,9 @@ const ProductSidemenu = ({ product, className }: ProductSidemenuProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>{isFavorite ? "Remove from wishlist" : "Add to wishlist"}</p>
+              <p className="text-accent-400 text-xl font-bold">
+                {isFavorite ? "Remove from wishlist" : "Add to wishlist"}
+              </p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -161,7 +163,7 @@ const ProductSidemenu = ({ product, className }: ProductSidemenuProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>Share product</p>
+              <p className="text-accent-400 text-xl font-bold">Share product</p>
             </TooltipContent>
           </Tooltip>
         </div>
