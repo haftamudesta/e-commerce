@@ -65,7 +65,6 @@ export default function QuickView({
           : product.price,
       image: getFullImageUrl(primaryImage?.image_url) || undefined,
       slug: product.slug || undefined,
-      quantity: quantity,
     });
     toast.success("Added to cart!", {
       description: `${quantity} × ${product.name} added to your cart`,
