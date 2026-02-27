@@ -44,14 +44,14 @@ export default function RootLayout({
                     {children}
                   </main>
                   <Toaster
-                    position="top-right"
+                    position="top-center"
                     richColors
                     closeButton
                     theme="system"
                     toastOptions={{
                       style: {
                         background: "var(--color-gray-800)",
-                        color: "var(--color-gray-100)",
+                        color: "var(--color-lime-500)",
                         border: "1px solid var(--color-gray-700)",
                       },
                       className: "font-sans",
