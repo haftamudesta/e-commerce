@@ -7,6 +7,7 @@ import { ProductsProvider } from "@/contexts/ProductContext";
 import { ReviewsProvider } from "@/contexts/ReviewContext";
 import "../globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
+import { StripeProvider } from "@/contexts/StripeContext";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -39,25 +40,27 @@ export default function RootLayout({
             <ProductsProvider>
               <ReviewsProvider>
                 <ThemeProvider>
-                  <Navbar />
-                  <main className="container mx-auto px-4 py-8">
-                    {children}
-                  </main>
-                  <Toaster
-                    position="top-center"
-                    richColors
-                    closeButton
-                    theme="system"
-                    toastOptions={{
-                      style: {
-                        background: "var(--color-gray-800)",
-                        color: "var(--color-lime-500)",
-                        border: "1px solid var(--color-gray-700)",
-                      },
-                      className: "font-sans",
-                      duration: 4000,
-                    }}
-                  />
+                  <StripeProvider>
+                    <Navbar />
+                    <main className="container mx-auto px-4 py-8">
+                      {children}
+                    </main>
+                    <Toaster
+                      position="top-center"
+                      richColors
+                      closeButton
+                      theme="system"
+                      toastOptions={{
+                        style: {
+                          background: "var(--color-gray-800)",
+                          color: "var(--color-lime-500)",
+                          border: "1px solid var(--color-gray-700)",
+                        },
+                        className: "font-sans",
+                        duration: 4000,
+                      }}
+                    />
+                  </StripeProvider>
                 </ThemeProvider>
               </ReviewsProvider>
             </ProductsProvider>
