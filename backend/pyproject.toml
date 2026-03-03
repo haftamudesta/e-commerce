@@ -11,6 +11,7 @@ dependencies = [
     "fastapi[standard]>=0.128.0",
     "passlib[argon2,bcrypt]>=1.7.4",
     "pydantic[all]>=2.12.5",
+    "python-dotenv>=1.2.1",
     "python-jose[cryptography]>=3.5.0",
     "python-multipart>=0.0.22",
     "sqlalchemy[standard]>=2.0.46",
