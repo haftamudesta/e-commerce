@@ -40,6 +40,9 @@ export interface SubscriptionResponse {
   client_secret: string;
   status: string;
 }
+export interface CreateCustomerResponse {
+  customer_id: string;
+}
 
 export interface SubscriptionStatusResponse {
   is_subscribed: boolean;
@@ -102,6 +105,15 @@ export const stripeService = {
   async searchCustomer(email: string) {
     const response = await axios.get(`${API_URL}/api/stripe/customers/search`, {
       params: { email },
+    });
+    return response.data;
+  },
+  async createCustomer(
+    email: string,
+    name?: string,
+  ): Promise<CreateCustomerResponse> {
+    const response = await axios.post(`${API_URL}/api/stripe/customers`, null, {
+      params: { email, name },
     });
     return response.data;
   },

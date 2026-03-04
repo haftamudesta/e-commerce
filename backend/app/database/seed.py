@@ -444,7 +444,6 @@ PRODUCTS = [
         "slug": "digital-air-fryer-xl-5-5qt",
         "status": "active",
         "images": [
-            "https://images.unsplash.com/photo-1625937281717-8e0c3f6b7b0a?w=500&auto=format&fit=crop",
             "https://images.unsplash.com/photo-1585515320310-259814833e62?w=500&auto=format&fit=crop"
         ]
     },
