@@ -209,6 +209,28 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     }
   };
 
+  const handleProceedToCheckout = () => {
+    handleAddToCart();
+    const checkoutData = {
+      items: [
+        {
+          name: currentProduct?.name,
+          description: currentProduct?.description,
+          price: parseFloat(currentProduct!.price.toString()),
+          quantity: quantity,
+          currency: "usd",
+          image:
+            getFullImageUrl(currentProduct?.primary_image?.image_url) ||
+            undefined,
+        },
+      ],
+      mode: "payment",
+    };
+    sessionStorage.setItem("checkoutItems", JSON.stringify(checkoutData.items));
+    console.log("checkoutData", checkoutData);
+    window.location.href = "/stripe/checkout";
+  };
+
   if (loading && !currentProduct) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -715,8 +737,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                         </div>
 
                         <button
-                          onClick={handleBuyNow}
-                          className="w-full px-6 py-3 border-2 border-primary-600 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-950 rounded-lg font-medium transition-colors"
+                          onClick={handleProceedToCheckout}
+                          className="w-full px-6 py-3 border-2 border-red-600 text-primary-600 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-950 rounded-lg font-medium transition-colors"
                         >
                           Buy Now
                         </button>
