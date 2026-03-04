@@ -100,8 +100,6 @@ export default function StripePage() {
               </Link>
             </div>
           </div>
-
-          {/* Subscription Card */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
             <div className="p-6">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
@@ -183,7 +181,6 @@ export default function StripePage() {
           </div>
         </div>
 
-        {/* Features Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-center mb-8">Features</h2>
           <div className="grid md:grid-cols-3 gap-6">
