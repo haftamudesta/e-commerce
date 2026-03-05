@@ -171,7 +171,7 @@ export default function AccountPage() {
 
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6 flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
@@ -187,7 +187,7 @@ export default function AccountPage() {
           <div className="p-6">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-lime-100 dark:bg-lime-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-lime-100 dark:bg-lime-900/30 rounded-full flex items-center justify-center shrink-0">
                   <User className="h-5 w-5 text-lime-600 dark:text-lime-400" />
                 </div>
                 <div className="flex-1">
