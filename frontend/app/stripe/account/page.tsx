@@ -26,7 +26,6 @@ export default function AccountPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    // Wait for auth to initialize
     if (!authLoading) {
       if (user) {
         fetchSubscriptionStatus();
@@ -102,7 +101,6 @@ export default function AccountPage() {
     }
   };
 
-  // Show loading while auth is initializing
   if (authLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -114,7 +112,6 @@ export default function AccountPage() {
     );
   }
 
-  // Show login prompt if not authenticated
   if (!user) {
     return (
       <div className="max-w-4xl mx-auto text-center py-12">
@@ -139,7 +136,6 @@ export default function AccountPage() {
     );
   }
 
-  // Show loading while fetching subscription data
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -177,7 +173,6 @@ export default function AccountPage() {
       )}
 
       <div className="grid gap-6">
-        {/* Account Info Card */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -229,8 +224,6 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-
-        {/* Subscription Status Card */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -302,8 +295,6 @@ export default function AccountPage() {
             )}
           </div>
         </div>
-
-        {/* Quick Actions */}
         {subscription?.is_subscribed && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
