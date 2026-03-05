@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { stripeService } from "@/lib/stripeApi";
@@ -192,16 +192,16 @@ export default function SuccessPage() {
             ) : (
               <Link
                 href="/dashboard"
-                className="bg-lime-500 hover:bg-lime-600 text-white py-3 px-8 rounded-md transition-colors font-medium"
+                className="bg-lime-500 hover:bg-lime-600 text-white py-3 px-8 rounded-4xl transition-colors font-medium"
               >
                 Go to Dashboard
               </Link>
             )}
             <Link
               href="/"
-              className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 py-3 px-8 rounded-md transition-colors font-medium"
+              className="bg-emerald-300 text-gray-700 dark:text-sky-500 hover:bg-gray-300 dark:hover:bg-gray-600 py-3 px-8 rounded-4xl transition-colors font-medium"
             >
-              Return Home
+              Back to Home
             </Link>
           </div>
 
