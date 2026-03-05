@@ -227,7 +227,6 @@ export default function StripePage() {
                 Get immediate confirmation of successful payments
               </p>
             </div>
-
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <svg

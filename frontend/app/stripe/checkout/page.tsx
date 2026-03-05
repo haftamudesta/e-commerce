@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import StripeCheckout from "@/components/stripe/checkout";
 import { CheckoutItem } from "@/lib/stripeApi";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, ArrowLeft, ShoppingBag } from "lucide-react";
+import { Loader2, ArrowLeft, ShoppingBag, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
   const mode =
     (searchParams.get("mode") as "payment" | "subscription") || "payment";
   const [checkoutItems, setCheckoutItems] = useState<CheckoutItem[]>([]);
@@ -18,50 +19,69 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadCheckoutItems();
-  }, []);
+    // Wait for auth to initialize
+    if (!authLoading) {
+      if (!user) {
+        // Redirect to login with return URL
+        const returnUrl = encodeURIComponent(
+          "/stripe/checkout" + window.location.search,
+        );
+        router.push(`/auth/login?returnUrl=${returnUrl}`);
+        return;
+      }
+
+      // Load checkout items
+      loadCheckoutItems();
+    }
+  }, [user, authLoading, router]);
 
   const loadCheckoutItems = () => {
     try {
-      const storedData = sessionStorage.getItem("checkoutItems");
+      const storedItems = sessionStorage.getItem("checkoutItems");
+      console.log("📦 Raw stored items:", storedItems);
 
-      if (!storedData) {
+      if (!storedItems) {
         setError("No items to checkout");
         setLoading(false);
         return;
       }
 
-      try {
-        const parsed = JSON.parse(storedData);
-        let items: CheckoutItem[] = [];
+      const parsed = JSON.parse(storedItems);
+      console.log("✅ Parsed items:", parsed);
 
-        if (Array.isArray(parsed)) {
-          items = parsed;
-        } else if (parsed.items && Array.isArray(parsed.items)) {
-          items = parsed.items;
-        } else if (parsed && typeof parsed === "object") {
-          items = [parsed];
-        }
-        const validItems = items.filter(
-          (item) =>
-            item &&
-            typeof item.name === "string" &&
-            typeof item.price === "number" &&
-            typeof item.quantity === "number" &&
-            item.currency,
-        );
+      // Handle different formats
+      let items: CheckoutItem[] = [];
 
-        if (validItems.length > 0) {
-          setCheckoutItems(validItems);
-          setError(null);
-        } else {
-          setError("No valid items found");
-        }
-      } catch (parseError) {
-        setError("Failed to parse checkout data");
+      if (Array.isArray(parsed)) {
+        items = parsed;
+        console.log("📦 Items is an array with length:", items.length);
+      } else if (parsed && typeof parsed === "object") {
+        items = [parsed];
+        console.log("📦 Items is a single object");
+      }
+
+      // Validate items
+      const validItems = items.filter(
+        (item) =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.price === "number" &&
+          typeof item.quantity === "number" &&
+          item.currency,
+      );
+
+      console.log("✅ Valid items:", validItems);
+
+      if (validItems.length > 0) {
+        setCheckoutItems(validItems);
+        // DON'T clear here - let the StripeCheckout component use it
+        // The component will handle clearing after successful payment
+      } else {
+        setError("No valid items found");
       }
     } catch (error) {
-      setError("Failed to load checkout");
+      console.error("❌ Error loading checkout:", error);
+      setError("Failed to load checkout items");
     } finally {
       setLoading(false);
     }
@@ -81,6 +101,19 @@ export default function CheckoutPage() {
     }).format(price);
   };
 
+  // Show loading while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-lime-500 animate-spin mx-auto" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while checkout items are loading
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -94,12 +127,15 @@ export default function CheckoutPage() {
     );
   }
 
+  // Show error state
   if (error || checkoutItems.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 max-w-md mx-auto">
-            <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-red-500" />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {error || "No Items to Checkout"}
             </h2>
@@ -136,9 +172,14 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Complete Your Purchase
         </h1>
+        <p className="mt-2 text-sm text-gray-500">
+          Checkout as{" "}
+          <span className="font-medium text-lime-600">{user?.email}</span>
+        </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
+        {/* Order Summary */}
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -165,7 +206,7 @@ export default function CheckoutPage() {
                         Quantity: {product.quantity}
                       </p>
                       <p className="text-sm font-medium text-lime-600 dark:text-lime-400">
-                        ${product.price.toFixed(2)} each
+                        {formatPrice(product.price)} each
                       </p>
                     </div>
                   </div>
@@ -190,11 +231,13 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        {/* Stripe Checkout */}
         <div className="lg:w-96">
           <StripeCheckout
             products={checkoutItems}
             mode={mode}
-            customerEmail={user?.email}
+            priceId={mode === "subscription" ? "price_123456789" : undefined}
             className="sticky top-4"
           />
         </div>
